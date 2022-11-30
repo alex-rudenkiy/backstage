@@ -1,0 +1,328 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: https-ingress-mapping-egress-https-request-response
+  elements: https-ingress-mapping-egress-https
+  title: HTTP Service
+  type: ''
+  description: HTTP service with ingress gateway, mapping and egress gateway
+  tags:
+  - openshift
+  - recommended
+spec:
+  owner: user:18908309
+  type: service
+  parameters:
+  - title: Заполнение полей шаблона для компонента ingress
+    required:
+    - CLUSTER
+    - PROJECT_NAME
+    - APP_NAME
+    - ISTIO_CONTROL_PLANE
+    - ISTIOD_NAME
+    - INGRESS_PORT
+    properties:
+      CLUSTER:
+        title: Название кластера
+        type: string
+        enum:
+        - https://45.9.25.134:5443
+      account:
+        title: Bitbucket account
+        type: string
+        default: SA-SDVO0000055
+        ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
+        type: string
+      INGRESS_PORT:
+        title: Порт ингресса
+        type: string
+  - title: Заполнение полей шаблона для компонента unimapper
+    required:
+    - EXTERNAL_PORT
+    - TEST_APP_URL
+    - MAPPING_JSON_RQ
+    - APP_NAME
+    - PROJECT_NAME
+    - EGRESS_PORT
+    - MAPPING_JSON_RS
+    - INTERNAL_PREFIX
+    properties:
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
+        type: string
+      account:
+        title: Bitbucket account
+        type: string
+        default: SA-SDVO0000055
+        ui:widget: hidden
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      MAPPING_JSON_RS:
+        title: JSON-строка маппинга ответа
+        type: string
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
+        type: string
+  - title: Заполнение полей шаблона для компонента egress
+    required:
+    - APP_NAME
+    - PROJECT_NAME
+    - ISTIO_CONTROL_PLANE
+    - EGRESS_PORT
+    - ISTIOD_NAME
+    properties:
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      account:
+        title: Bitbucket account
+        type: string
+        default: SA-SDVO0000055
+        ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
+        type: string
+  - title: Установка шаблона в проект
+    required:
+    - install
+    properties:
+      install:
+        title: Установить шаблон в проект
+        type: boolean
+        default: false
+    dependencies:
+      install:
+        oneOf:
+        - properties:
+            install:
+              const: false
+        - properties:
+            install:
+              const: true
+            cluster:
+              title: Cluster
+              type: string
+              description: Cluster
+              enum:
+              - https://45.9.25.134:5443
+            server:
+              title: API Server
+              type: string
+              description: API Server
+              enum:
+              - https://api.syn-sb.delta.sbrf.ru:6443
+              - https://api.dev-gen.delta.sbrf.ru:6443
+              - https://api.dev-gen2.delta.sbrf.ru:6443
+            project:
+              title: Project
+              type: string
+              description: Project
+            token:
+              title: Token
+              type: string
+              description: Token
+          required:
+          - cluster
+          - server
+          - project
+          - token
+  - title: Регистрация компонента в backstage
+    required:
+    - register
+    properties:
+      register:
+        title: Добавить компонент в backstage
+        type: boolean
+        default: false
+    dependencies:
+      register:
+        oneOf:
+        - properties:
+            register:
+              const: false
+        - properties:
+            register:
+              const: true
+            repoUrl:
+              title: Repository Location
+              type: string
+              ui:field: RepoUrlPicker
+              ui:options:
+                allowedHosts:
+                - stash.sigma.sbrf.ru
+            name:
+              title: Name
+              type: string
+              description: Unique name of the component
+              ui:autofocus: true
+              ui:options:
+                rows: 5
+            owner:
+              title: Owner
+              type: string
+              description: Owner of the component
+              ui:field: OwnerPicker
+              ui:options:
+                allowedKinds:
+                - Group
+  steps:
+  - id: fetch-base
+    name: Подготовка конфигов
+    action: fetch:template
+    input:
+      url: ./base
+      cookiecutterCompat: true
+      values:
+        name: ${{ parameters.name }}
+        owner: ${{ parameters.owner }}
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        CLUSTER: ${{parameters.CLUSTER}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
+        DOMAIN: ${{parameters.DOMAIN}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: fetch-template
+    name: Загрузка шаблона
+    action: fetch:template
+    input:
+      url: ./base/template
+      cookiecutterCompat: true
+      targetPath: ./templates/template
+      values:
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
+        CLUSTER: ${{parameters.CLUSTER}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        DOMAIN: ${{parameters.DOMAIN}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: generate
+    name: Генерация шаблона
+    action: generate:template
+    input:
+      url: ./template/template.yaml
+      targetPathForEnv: ./templates/template/template.env
+      targetPathForConfigs: ./templates/configs.yaml
+      downloadLink: https://stash.sigma.sbrf.ru/rest/api/latest/projects/~${{parameters.account}}/repos/BACKSTAGE_USER_ID/archive?format=zip
+      viewLink: https://stash.sigma.sbrf.ru/users/${{parameters.account}}/repos/BACKSTAGE_USER_ID/browse/configs.yaml?raw
+      values:
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
+        CLUSTER: ${{parameters.CLUSTER}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        DOMAIN: ${{parameters.DOMAIN}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: publish-to-storage
+    name: Публикация шаблона
+    action: publish:bitbucket
+    input:
+      description: This is name
+      repoVisibility: public
+      repoUrl: stash.sigma.sbrf.ru?repo=${{ steps.generate.output.userId }}&project=%7E${{parameters.account}}
+      sourcePath: templates
+  - id: install
+    name: Установка в проект OpenShift
+    action: install:openshift
+    input:
+      url: ./template/template.yaml
+      cluster: ${{ parameters.cluster }}
+      server: https://api.${{ parameters.cluster }}.delta.sbrf.ru:6443
+      project: ${{ parameters.project }}
+      token: ${{ parameters.token }}
+      projectLink: https://console-openshift-console.apps.${{ parameters.cluster }}.delta.sbrf.ru/k8s/cluster/projects/${{
+        parameters.project }}
+    if: ${{ parameters.install }}
+  - id: delete
+    name: Очистка вспомогательных файлов
+    action: fs:delete
+    input:
+      files:
+      - template
+  - id: publish
+    name: Публикация компонента
+    action: publish:bitbucket
+    input:
+      description: This is test-app from backstage
+      repoUrl: ${{ parameters.repoUrl }}
+    if: ${{ parameters.register }}
+  - id: register
+    name: Регистрация в Backstage
+    action: catalog:register
+    input:
+      repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+      catalogInfoPath: /catalog-info.yaml
+    if: ${{ parameters.register }}
+  output:
+    links:
+    - url: ${{ steps.generate.output.downloadLink }}
+      title: Скачать архив
+    - url: ${{ steps.generate.output.viewLink }}
+      title: Посмотреть шаблон
+      icon: chat
+    - url: ${{ steps.install.output.projectLink }}
+      title: Проект Openshift
+      icon: dashboard
+    - title: Репозиторий
+      url: ${{ steps.publish.output.remoteUrl }}
+    - title: Открыть в каталоге Backstage
+      icon: catalog
+      entityRef: ${{ steps.register.output.entityRef }}
