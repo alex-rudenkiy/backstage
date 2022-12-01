@@ -16,8 +16,8 @@ spec:
   - title: Заполнение полей шаблона для компонента ingress
     required:
     - INGRESS_PORT
-    - PROJECT_NAME
     - ISTIO_CONTROL_PLANE
+    - PROJECT_NAME
     - ISTIOD_NAME
     - APP_NAME
     properties:
@@ -29,11 +29,11 @@ spec:
         type: string
         default: user
         ui:widget: hidden
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
@@ -43,22 +43,37 @@ spec:
         type: string
   - title: Заполнение полей шаблона для компонента unimapper
     required:
-    - EGRESS_PORT
-    - MAPPING_JSON_RS
-    - INTERNAL_PREFIX
-    - PROJECT_NAME
+    - MAPPING_JSON_RQ
     - EXTERNAL_PORT
     - TEST_APP_URL
+    - PROJECT_NAME
+    - EGRESS_PORT
     - APP_NAME
-    - MAPPING_JSON_RQ
+    - MAPPING_JSON_RS
+    - INTERNAL_PREFIX
     properties:
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
+        type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
+        type: string
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       EGRESS_PORT:
         title: egress port
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
       MAPPING_JSON_RS:
         title: JSON-строка маппинга ответа
@@ -66,45 +81,30 @@ spec:
       INTERNAL_PREFIX:
         title: Префикс для целевого сервиса
         type: string
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
-      EXTERNAL_PORT:
-        title: Порт внешнего приложения
-        type: string
-      TEST_APP_URL:
-        title: Внешний хост приложения
-        type: string
-      APP_NAME:
-        title: Название сервиса
-        type: string
-      MAPPING_JSON_RQ:
-        title: JSON-строка маппинга запроса
-        type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - EGRESS_PORT
-    - PROJECT_NAME
     - ISTIO_CONTROL_PLANE
+    - PROJECT_NAME
     - ISTIOD_NAME
+    - EGRESS_PORT
     - APP_NAME
     properties:
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      EGRESS_PORT:
-        title: egress port
-        type: string
       PROJECT_NAME:
         title: Название проекта
         type: string
-      ISTIO_CONTROL_PLANE:
-        title: Название control panel
-        type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
+        type: string
+      EGRESS_PORT:
+        title: egress port
         type: string
       APP_NAME:
         title: Название сервиса
@@ -196,16 +196,16 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
-        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -220,13 +220,13 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -243,13 +243,13 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
