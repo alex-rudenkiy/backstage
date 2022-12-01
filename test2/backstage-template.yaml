@@ -154,7 +154,7 @@ spec:
     name: Подготовка конфигов
     action: fetch:template
     input:
-      url: ./base
+      url: ./app
       cookiecutterCompat: true
       values:
         name: ${{ parameters.name }}
@@ -172,7 +172,7 @@ spec:
     name: Загрузка шаблона
     action: fetch:template
     input:
-      url: ./base/template
+      url: ./app/template
       cookiecutterCompat: true
       targetPath: ./templates/template
       values:
