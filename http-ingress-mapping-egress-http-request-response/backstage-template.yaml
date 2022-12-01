@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-request-response
+  name: http-ingress-mapping-egress-http-request-response_
   elements: http-ingress-mapping-egress-http
-  title: HTTP Service
+  title: HTTP Service fix1
   type: ''
   description: HTTP service with ingress gateway, mapping and egress gateway
   tags:
@@ -188,7 +188,7 @@ spec:
     name: Подготовка конфигов
     action: fetch:template
     input:
-      url: ./app
+      url: ./templates/template
       cookiecutterCompat: true
       values:
         name: ${{ parameters.name }}
