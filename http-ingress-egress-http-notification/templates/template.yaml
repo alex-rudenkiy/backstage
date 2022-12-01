@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: http-ingress-egress-http-notification3
   elements: http-ingress-egress-http
-  title: httpProxy
+  title: httpProxy2
   type: ''
   description: qwerty
   tags:
