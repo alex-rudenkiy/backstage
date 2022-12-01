@@ -1,11 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification4
+  name: http-ingress-egress-http-notification5
   elements: http-ingress-egress-http
-  title: httpProxy3
+  title: httpProxy4
   type: ''
-  description: qwerty3
+  description: qwerty4
   tags:
   - openshift
   - recommended

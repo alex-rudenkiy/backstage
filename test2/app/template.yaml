@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification4
+  name: http-ingress-egress-http-notification5
 objects:
 - apiVersion: apps/v1
   kind: Deployment
