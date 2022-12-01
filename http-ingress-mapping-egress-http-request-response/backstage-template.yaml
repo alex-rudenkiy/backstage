@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-request-response_
+  name: http-ingress-mapping-egress-http-request-responseeeeeeee
   elements: http-ingress-mapping-egress-http
   title: HTTP Service fix1
   type: ''
