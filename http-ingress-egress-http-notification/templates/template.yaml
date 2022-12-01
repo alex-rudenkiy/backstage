@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification
+  name: http-ingress-egress-http-notification2
   elements: http-ingress-egress-http
   title: httpProxy
   type: ''
@@ -192,8 +192,8 @@ spec:
       url: template.yaml
       targetPathForEnv: app/openshift-template/template.env
       targetPathForConfigs: app/configs.yaml
-      downloadLink: http://178.170.192.103:8080/users/BACKSTAGE_USER_ID/app.zip
-      viewLink: http://178.170.192.103:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
+      downloadLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app.zip
+      viewLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
       values:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
