@@ -188,7 +188,7 @@ spec:
     name: Подготовка конфигов
     action: fetch:template
     input:
-      url: ./templates/template
+      url: ./app
       cookiecutterCompat: true
       values:
         name: ${{ parameters.name }}
@@ -210,7 +210,7 @@ spec:
     name: Загрузка шаблона
     action: fetch:template
     input:
-      url: app
+      url: ./app/template
       cookiecutterCompat: true
       targetPath: app/openshift-template
       values:
