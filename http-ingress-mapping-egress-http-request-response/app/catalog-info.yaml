@@ -4,4 +4,4 @@ metadata:
   name: http-ingress-mapping-egress-http-request-response
 spec:
   targets:
-  - ./template.yaml
+  - ./backstage-template.yaml
