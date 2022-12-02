@@ -1,10 +1,10 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification3
+  name: http-ingress-egress-http-notification
   elements: http-ingress-egress-http
-  title: httpProxy2
-  type: ''
+  title: httpProxy
+  type: notification
   description: qwerty
   tags:
   - openshift
@@ -15,13 +15,15 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - INGRESS_PORT
-    - ISTIOD_NAME
-    - CLUSTER
     - PROJECT_NAME
+    - INGRESS_PORT
     - ISTIO_CONTROL_PLANE
+    - ISTIOD_NAME
     - APP_NAME
     properties:
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       account:
         title: Bitbucket account
         type: string
@@ -30,47 +32,39 @@ spec:
       INGRESS_PORT:
         title: Порт ингресса
         type: string
-      ISTIOD_NAME:
-        title: Название деплоймента istiod
-        type: string
-      CLUSTER:
-        title: Название кластера
-        type: string
-        enum:
-        - https://45.9.25.134:5443
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
         type: string
       APP_NAME:
         title: Название сервиса
         type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - EGRESS_PORT
-    - ISTIOD_NAME
     - PROJECT_NAME
+    - EGRESS_PORT
     - ISTIO_CONTROL_PLANE
+    - ISTIOD_NAME
     - APP_NAME
     properties:
-      EGRESS_PORT:
-        title: egress port
+      PROJECT_NAME:
+        title: Название проекта
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      ISTIOD_NAME:
-        title: Название деплоймента istiod
-        type: string
-      PROJECT_NAME:
-        title: Название проекта
+      EGRESS_PORT:
+        title: egress port
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
         type: string
       APP_NAME:
         title: Название сервиса
@@ -97,7 +91,7 @@ spec:
               type: string
               description: Cluster
               enum:
-              - https://45.9.25.134:5443
+              - https://87.242.91.111:5443
             project:
               title: Project
               type: string
@@ -154,36 +148,32 @@ spec:
     name: Подготовка конфигов
     action: fetch:template
     input:
-      url: ./base
+      url: ./app
       cookiecutterCompat: true
       values:
         name: ${{ parameters.name }}
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        DOMAIN: ${{parameters.DOMAIN}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        CLUSTER: ${{parameters.CLUSTER}}
-        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
     input:
-      url: ./base/template
+      url: ./app/template
       cookiecutterCompat: true
-      targetPath: ./templates/template
+      targetPath: app/openshift-template
       values:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        DOMAIN: ${{parameters.DOMAIN}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        CLUSTER: ${{parameters.CLUSTER}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: generate
     name: Генерация шаблона
@@ -198,11 +188,9 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
-        DOMAIN: ${{parameters.DOMAIN}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        CLUSTER: ${{parameters.CLUSTER}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: archive-app-dir
     name: Архивация templates в workspace

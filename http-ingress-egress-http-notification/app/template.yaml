@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification3
+  name: http-ingress-egress-http-notification
 objects:
 - apiVersion: apps/v1
   kind: Deployment
@@ -236,33 +236,11 @@ objects:
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
     servers:
     - hosts:
-      - ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
+      - '*'
       port:
         name: http-{{cookiecutter.INGRESS_PORT}}
         number: {{cookiecutter.INGRESS_PORT}}
         protocol: HTTP
-- apiVersion: networking.k8s.io/v1
-  kind: Ingress
-  metadata:
-    labels:
-      template: {{cookiecutter.APP_NAME}}
-      app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
-      istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
-    annotations:
-      kubernetes.io/ingress.class: haproxy
-    name: ingressgateway-http
-  spec:
-    rules:
-    - host: ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
-      http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: ingressgateway-svc
-              port:
-                number: http-{{cookiecutter.INGRESS_PORT}}
 - apiVersion: v1
   kind: Service
   metadata:
@@ -282,6 +260,7 @@ objects:
     selector:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
+    type: LoadBalancer
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -553,7 +532,7 @@ objects:
     gateways:
     - {{cookiecutter.APP_NAME}}-egressgateway-gw
     hosts:
-    - ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
+    - '*'
     http:
     - match:
       - gateways:
@@ -577,7 +556,7 @@ objects:
       istio: egressgateway-{{cookiecutter.PROJECT_NAME}}
     servers:
     - hosts:
-      - ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
+      - '*'
       port:
         name: http-{{cookiecutter.EGRESS_PORT}}
         number: {{cookiecutter.EGRESS_PORT}}
