@@ -252,14 +252,20 @@ objects:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
     name: ingressgateway-svc
+    annotations:
+      kubernetes.io/elb.class: union
+      kubernetes.io/elb.subnet-id: 65529c62-e797-4e26-9282-86db36eb192e
+      kubernetes.io/elb.enterpriseID: a93d5bed-a526-47df-8bf1-5bd895bd1078
+      kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"cce-bandwidth-1669984443744","bandwidth_chargemode":"traffic","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
+      kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
+      kubernetes.io/elb.health-check-flag: 'on'
+      kubernetes.io/elb.health-check-option: '{"protocol":"TCP","delay":"5","timeout":"10","max_retries":"3"}'
   spec:
     ports:
-    - name: status-port
-      port: 15021
-      protocol: TCP
-      targetPort: 15021
     - name: http-{{cookiecutter.INGRESS_PORT}}
+      targetPort: {{cookiecutter.INGRESS_PORT}}
       port: {{cookiecutter.INGRESS_PORT}}
+      protocol: TCP
     selector:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
