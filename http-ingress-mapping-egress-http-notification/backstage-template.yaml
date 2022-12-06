@@ -1,11 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-notification
+  name: http-ingress-mapping-egress-http-notification2
   elements: http-ingress-mapping-egress-http
-  title: httpProxy
+  title: httpProxy2
   type: notification
-  description: qwerty
+  description: qwerty2
   tags:
   - openshift
   - recommended
@@ -127,7 +127,7 @@ spec:
               type: string
               description: Cluster
               enum:
-              - https://87.242.91.111:5443
+              - https://37.18.100.80:5443
             project:
               title: Project
               type: string
