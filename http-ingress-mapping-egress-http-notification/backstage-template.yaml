@@ -228,8 +228,8 @@ spec:
       url: template.yaml
       targetPathForEnv: app/openshift-template/template.env
       targetPathForConfigs: app/configs.yaml
-      downloadLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app.zip
-      viewLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
+      downloadLink: /users/BACKSTAGE_USER_ID/app.zip
+      viewLink: /users/BACKSTAGE_USER_ID/app/configs.yaml
       values:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
