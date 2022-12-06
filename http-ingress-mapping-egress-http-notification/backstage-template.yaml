@@ -1,0 +1,313 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: http-ingress-mapping-egress-http-notification
+  elements: http-ingress-mapping-egress-http
+  title: HTTP Service
+  type: notification
+  description: Test service
+  tags:
+  - openshift
+  - recommended
+spec:
+  owner: user:lowcode
+  type: service
+  parameters:
+  - title: Заполнение полей шаблона для компонента ingress
+    required:
+    - INGRESS_PORT
+    - ISTIOD_NAME
+    - PROJECT_NAME
+    - APP_NAME
+    - ISTIO_CONTROL_PLANE
+    properties:
+      account:
+        title: Bitbucket account
+        type: string
+        default: user
+        ui:widget: hidden
+      INGRESS_PORT:
+        title: Порт ингресса
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
+  - title: Заполнение полей шаблона для компонента unimapper
+    required:
+    - EXTERNAL_PORT
+    - TEST_APP_URL
+    - EGRESS_PORT
+    - MAPPING_JSON_RQ
+    - PROJECT_NAME
+    - APP_NAME
+    - INTERNAL_PREFIX
+    properties:
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
+        type: string
+      account:
+        title: Bitbucket account
+        type: string
+        default: user
+        ui:widget: hidden
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
+        type: string
+  - title: Заполнение полей шаблона для компонента egress
+    required:
+    - EGRESS_PORT
+    - ISTIOD_NAME
+    - PROJECT_NAME
+    - APP_NAME
+    - ISTIO_CONTROL_PLANE
+    properties:
+      account:
+        title: Bitbucket account
+        type: string
+        default: user
+        ui:widget: hidden
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
+  - title: Установка шаблона в проект
+    required:
+    - install
+    properties:
+      install:
+        title: Установить шаблон в проект
+        type: boolean
+        default: false
+    dependencies:
+      install:
+        oneOf:
+        - properties:
+            install:
+              const: false
+        - properties:
+            install:
+              const: true
+            cluster:
+              title: Cluster
+              type: string
+              description: Cluster
+              enum:
+              - https://37.18.100.80:5443
+            project:
+              title: Project
+              type: string
+              description: Project
+            token:
+              title: Token
+              type: string
+              description: Token
+          required:
+          - cluster
+          - project
+          - token
+  - title: Регистрация компонента в backstage
+    required:
+    - register
+    properties:
+      register:
+        title: Добавить компонент в backstage
+        type: boolean
+        default: false
+    dependencies:
+      register:
+        oneOf:
+        - properties:
+            register:
+              const: false
+        - properties:
+            register:
+              const: true
+            repoUrl:
+              title: Repository Location
+              type: string
+              ui:field: RepoUrlPicker
+              ui:options:
+                allowedHosts:
+                - github.com
+            name:
+              title: Name
+              type: string
+              description: Unique name of the component
+              ui:autofocus: true
+              ui:options:
+                rows: 5
+            owner:
+              title: Owner
+              type: string
+              description: Owner of the component
+              ui:field: OwnerPicker
+              ui:options:
+                allowedKinds:
+                - Group
+  steps:
+  - id: fetch-base
+    name: Подготовка конфигов
+    action: fetch:template
+    input:
+      url: ./app
+      cookiecutterCompat: true
+      values:
+        name: ${{ parameters.name }}
+        owner: ${{ parameters.owner }}
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: fetch-template
+    name: Загрузка шаблона
+    action: fetch:template
+    input:
+      url: ./app/template
+      cookiecutterCompat: true
+      targetPath: app/openshift-template
+      values:
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: generate
+    name: Генерация шаблона
+    action: generate:template
+    input:
+      url: template.yaml
+      targetPathForEnv: app/openshift-template/template.env
+      targetPathForConfigs: app/configs.yaml
+      downloadLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app.zip
+      viewLink: http://37.18.121.76:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
+      values:
+        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        APP_NAME: ${{parameters.APP_NAME}}
+        PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+  - id: archive-app-dir
+    name: Архивация templates в workspace
+    action: archive:localdir
+    input:
+      url: app
+      format: zip
+      targetPath: app.zip
+  - id: delete-openshift-template
+    name: Очистка вспомогательных файлов
+    action: fs:delete
+    input:
+      files:
+      - app/openshift-template
+  - id: publish-to-local-dir
+    name: Публикация шаблона в директорию
+    action: publish:file
+    input:
+      path: /app/users/${{ steps.generate.output.userId }}
+  - id: install
+    name: Установка в проект Sbercloud
+    action: install:openshift
+    input:
+      url: template.yaml
+      cluster: ${{ parameters.cluster }}
+      server: ${{ parameters.cluster }}
+      project: ${{ parameters.project }}
+      token: ${{ parameters.token }}
+      projectLink: http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/deployment?namespace=${{
+        parameters.project }}
+    if: ${{ parameters.install }}
+  - id: delete
+    name: Очистка вспомогательных файлов
+    action: fs:delete
+    input:
+      files:
+      - template.yaml
+      - app.zip
+  - id: publish
+    name: Публикация компонента
+    action: publish:github
+    input:
+      allowedHosts:
+      - github.com
+      description: This is test-app from backstage
+      repoUrl: ${{ parameters.repoUrl }}
+    if: ${{ parameters.register }}
+  - id: register
+    name: Регистрация в Backstage
+    action: catalog:register
+    input:
+      repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+      catalogInfoPath: /catalog-info.yaml
+    if: ${{ parameters.register }}
+  output:
+    links:
+    - url: ${{ steps.generate.output.downloadLink }}
+      title: Скачать архив
+    - url: ${{ steps.generate.output.viewLink }}
+      title: Посмотреть шаблон
+      icon: chat
+    - url: ${{ steps.install.output.projectLink }}
+      title: Проект Sbercloud
+      icon: dashboard
+    - title: Репозиторий
+      url: ${{ steps.publish.output.remoteUrl }}
+    - title: Открыть в каталоге Backstage
+      icon: catalog
+      entityRef: ${{ steps.register.output.entityRef }}
