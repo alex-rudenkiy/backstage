@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-ingress-egress-http-notification
   elements: http-ingress-egress-http
-  title: httpProxy
+  title: proxy
   type: notification
-  description: qwerty
+  description: qwe
   tags:
   - openshift
   - recommended
