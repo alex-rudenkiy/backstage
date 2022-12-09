@@ -2,10 +2,10 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: http-ingress-mapping-egress-http-notification
-  elements: http-ingress-unimapper-egress-http
+  elements: http-ingress-mapping-egress-http
   title: mapping
   type: notification
-  description: qwe
+  description: qwerty
   tags:
   - openshift
   - recommended
