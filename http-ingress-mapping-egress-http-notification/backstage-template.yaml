@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-ingress-mapping-egress-http-notification
   elements: http-ingress-mapping-egress-http
-  title: mapping
+  title: map
   type: notification
-  description: qwerty
+  description: abc
   tags:
   - openshift
   - recommended
