@@ -1,11 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-notification
-  elements: http-ingress-mapping-egress-http-tmp-8c99f367e2c541b7a661c6431766f63b
-  title: HTTPS Service
-  type: notification
-  description: HTTPS service with ingress gateway, mapping and egress gateway
+  name: https-ingress-mapping-egress-https-request-response
+  elements: https-ingress-mapping-egress-https
+  title: HTTP Service
+  type: ''
+  description: HTTP service with ingress gateway, mapping and egress gateway
   tags:
   - openshift
   - recommended
@@ -15,85 +15,85 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - ISTIOD_NAME
-    - APP_NAME
     - CLUSTER
-    - INGRESS_PORT
-    - PROJECT_NAME
+    - ISTIOD_NAME
     - ISTIO_CONTROL_PLANE
+    - PROJECT_NAME
+    - APP_NAME
+    - INGRESS_PORT
     properties:
-      ISTIOD_NAME:
-        title: Название деплоймента istiod
-        type: string
-      account:
-        title: Bitbucket account
-        type: string
-        default: SA-SDVO0000055
-        ui:widget: hidden
-      APP_NAME:
-        title: Название сервиса
-        type: string
       CLUSTER:
         title: Название кластера
         type: string
         enum:
-        - https://37.18.100.80:5443
-      INGRESS_PORT:
-        title: Порт ингресса
+        - https://45.9.25.134:5443
+      account:
+        title: Bitbucket account
         type: string
-      PROJECT_NAME:
-        title: Название проекта
+        default: SA-SDVO0000055
+        ui:widget: hidden
+      ISTIOD_NAME:
+        title: Название деплоймента istiod
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
         type: string
-  - title: Заполнение полей шаблона для компонента mapping
-    required:
-    - APP_NAME
-    - PROJECT_NAME
-    - TEST_APP_URL
-    - EGRESS_PORT
-    - INTERNAL_PREFIX
-    - RAW_SPEC
-    - MAPPING_JSON_RQ
-    - EXTERNAL_PORT
-    properties:
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       APP_NAME:
         title: Название сервиса
+        type: string
+      INGRESS_PORT:
+        title: Порт ингресса
+        type: string
+  - title: Заполнение полей шаблона для компонента unimapper
+    required:
+    - MAPPING_JSON_RQ
+    - EGRESS_PORT
+    - PROJECT_NAME
+    - APP_NAME
+    - TEST_APP_URL
+    - EXTERNAL_PORT
+    - MAPPING_JSON_RS
+    - INTERNAL_PREFIX
+    properties:
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: SA-SDVO0000055
         ui:widget: hidden
+      EGRESS_PORT:
+        title: egress port
+        type: string
       PROJECT_NAME:
         title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
       TEST_APP_URL:
         title: Внешний хост приложения
         type: string
-      EGRESS_PORT:
-        title: egress port
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
+        type: string
+      MAPPING_JSON_RS:
+        title: JSON-строка маппинга ответа
         type: string
       INTERNAL_PREFIX:
         title: Префикс для целевого сервиса
         type: string
-      RAW_SPEC:
-        title: Текст спецификации
-        type: string
-      MAPPING_JSON_RQ:
-        title: JSON-строка маппинга запроса
-        type: string
-      EXTERNAL_PORT:
-        title: Порт внешнего приложения
-        type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
     - ISTIOD_NAME
-    - APP_NAME
-    - PROJECT_NAME
     - EGRESS_PORT
     - ISTIO_CONTROL_PLANE
+    - PROJECT_NAME
+    - APP_NAME
     properties:
       ISTIOD_NAME:
         title: Название деплоймента istiod
@@ -103,17 +103,17 @@ spec:
         type: string
         default: SA-SDVO0000055
         ui:widget: hidden
-      APP_NAME:
-        title: Название сервиса
-        type: string
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       EGRESS_PORT:
         title: egress port
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -137,7 +137,7 @@ spec:
               type: string
               description: Cluster
               enum:
-              - https://37.18.100.80:5443
+              - https://45.9.25.134:5443
             server:
               title: API Server
               type: string
@@ -210,19 +210,19 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         CLUSTER: ${{parameters.CLUSTER}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         DOMAIN: ${{parameters.DOMAIN}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -234,18 +234,18 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         CLUSTER: ${{parameters.CLUSTER}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         DOMAIN: ${{parameters.DOMAIN}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -259,18 +259,18 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         CLUSTER: ${{parameters.CLUSTER}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         DOMAIN: ${{parameters.DOMAIN}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: publish-to-storage
     name: Публикация шаблона
     action: publish:bitbucket

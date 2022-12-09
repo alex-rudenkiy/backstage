@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-notification
+  name: https-ingress-mapping-egress-https-request-response
 objects:
 - apiVersion: apps/v1
   kind: Deployment
@@ -238,9 +238,14 @@ objects:
     - hosts:
       - ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
       port:
-        name: http-{{cookiecutter.INGRESS_PORT}}
+        name: https-{{cookiecutter.INGRESS_PORT}}
         number: {{cookiecutter.INGRESS_PORT}}
-        protocol: HTTP
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem
+        mode: SIMPLE
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -248,14 +253,31 @@ objects:
       template: {{cookiecutter.APP_NAME}}
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
-    name: ingressgateway-http
+    name: ingressgateway-https
   spec:
     host: ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
     port:
-      targetPort: http-{{cookiecutter.INGRESS_PORT}}
+      targetPort: https-{{cookiecutter.INGRESS_PORT}}
+    tls:
+      termination: passthrough
     to:
       kind: Service
       name: ingressgateway-svc
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: istio-ingressgateway-certs
+  data:
+    tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlFQ1RDQ0F2R2dBd0lCQWdJQkFEQU5CZ2txaGtpRzl3MEJBUXNGQURBck1SQXdEZ1lEVlFRS0RBZFRlVzVoDQpjSE5sTVJjd0ZRWURWUVFEREE1emVXMXdiR1V1YzJKbGNpNXlkVEFlRncweU1URXlNVEF4TlRNek16bGFGdzB5DQpPREEyTURFeE5UTXpNemxhTUdBeEN6QUpCZ05WQkFZVEFsSlZNUTh3RFFZRFZRUUlEQVpOYjNOamIzY3hEekFODQpCZ05WQkFjTUJrMXZjMk52ZHpFTk1Bc0dBMVVFQ2d3RVUySmxjakVnTUI0R0ExVUVBd3dYS2k1a1pYWXRaMlZ1DQpMbVJsYkhSaExuTmljbVl1Y25Vd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURlDQpObUQ0bmpKTVFWN2JQeDh4OWYwTDV5MmJvV1NHZ3pkTzFQazJIc3FFa3p3NTJNbi83YUhjU1ROZjRKcklRejQ1DQpFc1FneVIxbkZPajVhb2U3aVJKbHNVQnQza2RQNWRnUmZ4ZGZyelo4dU9wQThuOWVpdGtZY3cwTnpzamdWVDg4DQpGZUwxSlB4aGhYSG8wNTYvNVNPSS9ueVdMcHB4RURxaEFVRWVjSTZmR0Y2b3BtcnpqMXk4SkZFaVVlQ0hraFJuDQpNdDFyOCt3T21tSWJMVU1oSkU3RTF1aGlMSEVDRExOOWIxMURFRUhuUDFMYzhnb2ZyYnpwbU5pVXpzSWh2QUlEDQpBOWFLK0hiTCtiNWtENlFXWno0c281R21KaThFbzBkOGoxYTI5dXY3ZmhUZ1dBcGhpNHoza05jclQ0SzBYZTc5DQo2MkRDWFgyUFRObUZkQ0NvY1FTaEFnTUJBQUdqZ2dFQk1JSCtNSUg3QmdOVkhSRUVnZk13Z2ZDQ0hDb3VZWEJ3DQpjeTVrWlhZdFoyVnVMbVJsYkhSaExuTmljbVl1Y25XQ0d5b3VjMmd4TG1SbGRpMW5aVzR1WkdWc2RHRXVjMkp5DQpaaTV5ZFlJYktpNXphREl1WkdWMkxXZGxiaTVrWld4MFlTNXpZbkptTG5KMWdoc3FMbk5vTXk1a1pYWXRaMlZ1DQpMbVJsYkhSaExuTmljbVl1Y25XQ0d5b3VjMmcwTG1SbGRpMW5aVzR1WkdWc2RHRXVjMkp5Wmk1eWRZSWJLaTV6DQphRFV1WkdWMkxXZGxiaTVrWld4MFlTNXpZbkptTG5KMWdpQXFMbVJsZGkxaGNIQnpMbTlqY0MxblpXOHVaR1ZzDQpkR0V1YzJKeVppNXlkWUlkS2k1a1pYWXRZWEJ3Y3k1dlkzQXRaMlZ2TG1OaExuTmljbVl1Y25Vd0RRWUpLb1pJDQpodmNOQVFFTEJRQURnZ0VCQUJzdk1penJ6QVM1dlhOWksxOTJuYmo0UjQxMktDaHJYRFNPSDI1MklEL2xKYys5DQo2QS85cmJoaitkYVRTU2c4d3FQUlIzVzhmQTB5Wm5NV3cxVUxhMjl4aWtySlFoVTFrTlJ2UXBHQTJJY05DY0RHDQpZTG52VXlNRi9DVVdyNWtGUVBZd0RLdVN6bUFHM0hFVlJ3ajJrS3U0VUpqSjVaM3FvZjlkTGpUTWU0QnJYZDR5DQpmSGJSMDdxc29ERFAzeHZuUTZaVVZUNG92eksxWlNCQlY1TzZPenpHRU8reUFVNEFPZlMrbVJYVmNyU2F0QWozDQpEK21ENWRyNFNBMmlXbHFhak9YL3RXRUlpZGJWUnpEUm4xZmw5bEhybXBjdG5Oczdhc1V6YytPSkF5OGZHV3JWDQp3eE9LL2xIVzlTcnJ6OFBXTXZGOEpyZDdkSXJuUDhRZ00rblMxYnc9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=
+    tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlFdmdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLZ3dnZ1NrQWdFQUFvSUJBUURlTm1ENG5qSk1RVjdiDQpQeDh4OWYwTDV5MmJvV1NHZ3pkTzFQazJIc3FFa3p3NTJNbi83YUhjU1ROZjRKcklRejQ1RXNRZ3lSMW5GT2o1DQphb2U3aVJKbHNVQnQza2RQNWRnUmZ4ZGZyelo4dU9wQThuOWVpdGtZY3cwTnpzamdWVDg4RmVMMUpQeGhoWEhvDQowNTYvNVNPSS9ueVdMcHB4RURxaEFVRWVjSTZmR0Y2b3BtcnpqMXk4SkZFaVVlQ0hraFJuTXQxcjgrd09tbUliDQpMVU1oSkU3RTF1aGlMSEVDRExOOWIxMURFRUhuUDFMYzhnb2ZyYnpwbU5pVXpzSWh2QUlEQTlhSytIYkwrYjVrDQpENlFXWno0c281R21KaThFbzBkOGoxYTI5dXY3ZmhUZ1dBcGhpNHoza05jclQ0SzBYZTc5NjJEQ1hYMlBUTm1GDQpkQ0NvY1FTaEFnTUJBQUVDZ2dFQkFNRGt2NFRSL3FPSFU0cEszdytGazZZVGhkbkZYZmdPUzZLWTZjUjdNaDJuDQptZTQxTEJTSCthdTV0MmtSRmd1bG80dnpxR0UxYzlxWm9pdHd1R2FvOUZsbVpxRjVCTHBzc1FWdko2RWQvZFNDDQp5SWFjZXNoZEMxdFg5QXI2YUJHa3JvSEFGZ1hybDFJb2Z0czNhR1QzeWNNUDlxSi96ZjA3czBrMFI0emU5RTlSDQpQMlBJUEtsWk9HdHhIUVp6ZVRaeTZxTHhEeU5YYWFXTk1rbGo4TEZpbk56WnNFMkEyUWQzdThKRU1ldm1JRUp5DQpKZEJIYVFMS3E1Yy9kYmdyV1pZODUvL1JjN2dCdk9Ka2xmUTBUZ3U5Q3M4OFh1KzlTRGptdHltRjdyV3NLRkV4DQovNTZBK3MyN0JQYVMyVkFsbnhUbHBXc28wbUhEUm5ZWGlLOXFUY25TRElrQ2dZRUEvZlF1YWxRSnVieFlqQWRCDQpVZi93eHRjazJ5d0VlUFRDV3dxN04wU1lnb2h6ZHVrOHlJbjVnNlUvd1Y5UGk0dyt2TkZFbU1JVXEyZUtIdGtwDQpvOUlEbjZpcUdXRWRsOGxIWE1wS1lmaDVMbWM4SDFzdVFtZlVXQytrbTJZRWJ1ek9CSmcxTmFOMVd2UVBEUkw5DQpSWk10UnZHcGY4ZU9veXNuZUI3eVJOSjdTaXNDZ1lFQTRBQzUxOWpIaU5NaHgzY3ozNkwyUS9PWUdnc2hndDFEDQpJcDU2ellPRjMvS3JITmQ1WVVkdGJuNEVWa0h4MmNSb0NiV2RuWWJmWDVCYWYrdDNHbmhuL3lkUzhqWDlPbnZ4DQozNXFJeTl2cFRGa0JRSzl4QnF6WnptZXZ2Sjk1elFoZ29LTCszdSttUjRpN2M2cExUL2tURnpFc2JPRWRkT0JEDQpPcmxSdHBnTkFtTUNnWUVBaFdoTktkWlQ5WnFYK1plbUhPbVRGeUhXWHJ6VTdLWEhwQVFUTFlsL2hMTWgxUW5aDQp3SSthNENsalFMWk5GMFhwZjA5LzlhK2ZKQndVVnZoR0E2VkQrZytrckFoMGYxUmhoTUZRS2Y5WnlhSzUxczhUDQpraGJ4V2hKTktzV0E5clMzMVhvUUdjbHcwUUw5RlNVd24rZ2RGUFBHMHpXR0hQbUNsbnZMVVpRdzZGa0NnWUFNDQpCLzN6V2ZGZHAvbG9mVDZNQkhTMXNaKzV4bDlHYUJ2ekFCQVllYmYzRDFHaGV2RktDRXdZWXl4WWRiSkh3QVRXDQpnS3EyaTBmMEdnekNVaU5UaUtRTlVFOWtNd0ltNGdGYndURVh3ZmdGNGNIdmQzemFudTRUNS8zSVk4aG0rc3cxDQoxSXRiN2dOQVZGZTlIcWhzNHpQalN3RFgyRDk4eDQ3VTJKOUs3MS9EZ1FLQmdBVUxoV2N0SngwQXFhZDdnMlhDDQpieWZPUmI3WDBnLys1d1JpckR6V3ZJWWswZjdXb0ZHNERhaXloR0R2bDJlK1FhbkYrV1pPcGxCZkc5MGV2cEtRDQpGdVFQNDBqS2xBWTJuVTUyYVUzSC90V1BlTjUzYXJhUGsrd1lpVU52VFQ5OEowYjlic3BOb3hJS0hITXJJckRTDQpYUHJlMHVVdWRHcFcxWEpkTEc4MXM4VkMNCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0NCg==
+  type: Opaque
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: istio-ingressgateway-ca-certs
+  data:
+    ca-chain.cert.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlETnpDQ0FoK2dBd0lCQWdJVWNyV3oxT0QrcDlkVVNnOVk5NUw5QnpKNUYya3dEUVlKS29aSWh2Y05BUUVMDQpCUUF3S3pFUU1BNEdBMVVFQ2d3SFUzbHVZWEJ6WlRFWE1CVUdBMVVFQXd3T2MzbHRjR3hsTG5OaVpYSXVjblV3DQpIaGNOTWpFeE1qRXdNVFV6TXpJMVdoY05NekV3TWpJMk1UVXpNekkxV2pBck1SQXdEZ1lEVlFRS0RBZFRlVzVoDQpjSE5sTVJjd0ZRWURWUVFEREE1emVXMXdiR1V1YzJKbGNpNXlkVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnZ0VQQURDQ0FRb0NnZ0VCQUptTHVBd05OczJYRzVvNC9JaGZiN0VwM3NLK2N5UVFkMWNGdmRBL2U2OHZmUWwzDQpTYnAvK2tOOURtM2ZUS20rVkVoK2FKc1pleXJrWmVzMGZlRmg1UllSV1lReHFnQzRRYjI2NWJkRUdPT0w0TCtBDQpLQTFOWmJERFVPOExOWTRRZG5sdCtvdEtnbm5EOFhGNVBGSTIyTUhwRCtCZy9CcHZrcUFQNEN3bDVvV0FYWVdIDQoxaXV3Q3FYRmpIWlVnOFRFWWlKUGlxQmtuUXl2REdINkxKcGdoK3AxNlNuSExsU0NVbWNJeCtVMHJtenJWQkI4DQo5T2c0RjVROWlXSUE3SHN3YkViSWg5WG5IYmlXdGtnY2RWck5KNE9vdjVheS9HY1FnT1U0ZU1qWnNpYmMwa2Z6DQpTcnlOU3hIaXVCSWd6eGR6YllrNDZqM3Z5YWxMRU13dHJsdk51d2tDQXdFQUFhTlRNRkV3SFFZRFZSME9CQllFDQpGT05FZHRVZmlocGxZak5CcEhVSnJ5bm1qZEo2TUI4R0ExVWRJd1FZTUJhQUZPTkVkdFVmaWhwbFlqTkJwSFVKDQpyeW5tamRKNk1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFJeFVlSEFpDQppTHRTMVd3Ui9PNVplSC9icHoxWC9LZS9WOUlKYTZyVjJNTFhTQXY3N0cxOXRYVk05bjNRK2puaFkzTEk5Z2x3DQpXc255d21VVE96TGdQSll2R2R3bkptMmZFL0U3RnNuUnFsMWFHdVU3RjZvb2xyT3N3bi9ETUtlYXUzVUIvb1pkDQo0VUplbmNNQStCV2JmVDk4emFaZkI4L2F0R21EQ0JkQXBLbUpPdCswTytlaHU0SE1iRDAyMm5IVHg2eDdpbjYvDQo3K0NXc2IvZVZZZEtuZ2QrUmN0VUlBSUExZXNIS1FUQ29VcnJiL1AzcGRxSnIyWGoxS0tKNGNnWnQ4a1dDbmloDQo4YkZUWWVKSWZsZjBWVERkcnIvdFZtc1F0SStINExNVThjTVBqWnQ4MlVsYlBmU0s2MktnakNCZnc0dmh4eVNDDQpxWU5xYzJTNHowb1hPVnM9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=
+  type: Opaque
 - apiVersion: v1
   kind: Service
   metadata:
@@ -270,8 +292,10 @@ objects:
       port: 15021
       protocol: TCP
       targetPort: 15021
-    - name: http-{{cookiecutter.INGRESS_PORT}}
+    - name: https-{{cookiecutter.INGRESS_PORT}}
+      protocol: TCP
       port: {{cookiecutter.INGRESS_PORT}}
+      targetPort: {{cookiecutter.INGRESS_PORT}}
     selector:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
@@ -344,10 +368,12 @@ objects:
     labels:
       app: {{cookiecutter.APP_NAME}}
   data:
-    TRANSFORM_RESPONSE: 'false'
+    TRANSFORM_RESPONSE: 'true'
     LOG_LEVEL: debug
     JSON_REQUEST: /schemas/json-request.json
+    JSON_RESPONSE: /schemas/json-response.json
     json-request.json: '[{{cookiecutter.MAPPING_JSON_RQ}}]'
+    json-response.json: '[{{cookiecutter.MAPPING_JSON_RS}}]'
 - apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
   metadata:
@@ -378,8 +404,11 @@ objects:
     hosts:
     - {{cookiecutter.TEST_APP_URL}}
     ports:
-    - name: http
+    - name: https-{{cookiecutter.EXTERNAL_PORT}}
       number: {{cookiecutter.EXTERNAL_PORT}}
+      protocol: HTTPS
+    - name: http-{{cookiecutter.EGRESS_PORT}}
+      number: {{cookiecutter.EGRESS_PORT}}
       protocol: HTTP
     resolution: DNS
 - apiVersion: networking.istio.io/v1alpha3
@@ -398,16 +427,16 @@ objects:
     - match:
       - gateways:
         - mesh
-        port: {{cookiecutter.EXTERNAL_PORT}}
+        port: {{cookiecutter.EGRESS_PORT}}
       route:
       - destination:
           host: egressgateway-svc
           port:
-            number: 8080
+            number: {{cookiecutter.EGRESS_PORT}}
     - match:
       - gateways:
         - {{cookiecutter.APP_NAME}}-egressgateway-gw
-        port: 8080
+        port: {{cookiecutter.EGRESS_PORT}}
       route:
       - destination:
           host: {{cookiecutter.TEST_APP_URL}}
@@ -430,52 +459,25 @@ objects:
         number: {{cookiecutter.EGRESS_PORT}}
         protocol: HTTP
 - apiVersion: networking.istio.io/v1alpha3
-  kind: EnvoyFilter
+  kind: DestinationRule
   metadata:
-    name: trace-filter
-    labels:
-      workload-type: pod
+    name: {{cookiecutter.APP_NAME}}-external-host-dr
   spec:
-    configPatches:
-    - applyTo: CLUSTER
-      match:
-        context: SIDECAR_OUTBOUND
-      patch:
-        operation: ADD
-        value:
-          name: trace_analyzer
-          type: LOGICAL_DNS
-          connect_timeout: 0.5s
-          lb_policy: ROUND_ROBIN
-          load_assignment:
-            cluster_name: trace_analyzer
-            endpoints:
-            - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      protocol: TCP
-                      address: apiclarity.saex.svc.cluster.local
-                      port_value: 9000
-- apiVersion: extensions.istio.io/v1alpha1
-  kind: WasmPlugin
-  metadata:
-    name: trace-filter
-  spec:
-    url: oci://ilyinus/wasm
-    phase: AUTHN
-- apiVersion: apiclarity.sbrf.ru/v1alpha1
-  kind: ApiClaritySpec
-  metadata:
-    labels:
-      template: {{cookiecutter.APP_NAME}}
-    name: {{cookiecutter.PROJECT_NAME}}
-  spec:
-    apiSpecs:
-    - name: {{cookiecutter.APP_NAME}}-svc
-      port: 8787
-      rawSpec: {{cookiecutter.RAW_SPEC}}
-      serviceType: {{cookiecutter.SERVICE_TYPE}}
+    exportTo:
+    - .
+    host: {{cookiecutter.TEST_APP_URL}}
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+      portLevelSettings:
+      - port:
+          number: {{cookiecutter.EXTERNAL_PORT}}
+        tls:
+          caCertificates: /etc/istio/egressgateway-ca-certs/ca-chain.cert.pem
+          clientCertificate: /etc/istio/egressgateway-certs/tls.crt
+          mode: MUTUAL
+          privateKey: /etc/istio/egressgateway-certs/tls.key
+          sni: {{cookiecutter.TEST_APP_URL}}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -706,3 +708,18 @@ objects:
     selector:
       app: egressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: egressgateway-{{cookiecutter.PROJECT_NAME}}
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: istio-egressgateway-certs
+  data:
+    tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlFQ1RDQ0F2R2dBd0lCQWdJQkFEQU5CZ2txaGtpRzl3MEJBUXNGQURBck1SQXdEZ1lEVlFRS0RBZFRlVzVoDQpjSE5sTVJjd0ZRWURWUVFEREE1emVXMXdiR1V1YzJKbGNpNXlkVEFlRncweU1URXlNVEF4TlRNek16bGFGdzB5DQpPREEyTURFeE5UTXpNemxhTUdBeEN6QUpCZ05WQkFZVEFsSlZNUTh3RFFZRFZRUUlEQVpOYjNOamIzY3hEekFODQpCZ05WQkFjTUJrMXZjMk52ZHpFTk1Bc0dBMVVFQ2d3RVUySmxjakVnTUI0R0ExVUVBd3dYS2k1a1pYWXRaMlZ1DQpMbVJsYkhSaExuTmljbVl1Y25Vd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURlDQpObUQ0bmpKTVFWN2JQeDh4OWYwTDV5MmJvV1NHZ3pkTzFQazJIc3FFa3p3NTJNbi83YUhjU1ROZjRKcklRejQ1DQpFc1FneVIxbkZPajVhb2U3aVJKbHNVQnQza2RQNWRnUmZ4ZGZyelo4dU9wQThuOWVpdGtZY3cwTnpzamdWVDg4DQpGZUwxSlB4aGhYSG8wNTYvNVNPSS9ueVdMcHB4RURxaEFVRWVjSTZmR0Y2b3BtcnpqMXk4SkZFaVVlQ0hraFJuDQpNdDFyOCt3T21tSWJMVU1oSkU3RTF1aGlMSEVDRExOOWIxMURFRUhuUDFMYzhnb2ZyYnpwbU5pVXpzSWh2QUlEDQpBOWFLK0hiTCtiNWtENlFXWno0c281R21KaThFbzBkOGoxYTI5dXY3ZmhUZ1dBcGhpNHoza05jclQ0SzBYZTc5DQo2MkRDWFgyUFRObUZkQ0NvY1FTaEFnTUJBQUdqZ2dFQk1JSCtNSUg3QmdOVkhSRUVnZk13Z2ZDQ0hDb3VZWEJ3DQpjeTVrWlhZdFoyVnVMbVJsYkhSaExuTmljbVl1Y25XQ0d5b3VjMmd4TG1SbGRpMW5aVzR1WkdWc2RHRXVjMkp5DQpaaTV5ZFlJYktpNXphREl1WkdWMkxXZGxiaTVrWld4MFlTNXpZbkptTG5KMWdoc3FMbk5vTXk1a1pYWXRaMlZ1DQpMbVJsYkhSaExuTmljbVl1Y25XQ0d5b3VjMmcwTG1SbGRpMW5aVzR1WkdWc2RHRXVjMkp5Wmk1eWRZSWJLaTV6DQphRFV1WkdWMkxXZGxiaTVrWld4MFlTNXpZbkptTG5KMWdpQXFMbVJsZGkxaGNIQnpMbTlqY0MxblpXOHVaR1ZzDQpkR0V1YzJKeVppNXlkWUlkS2k1a1pYWXRZWEJ3Y3k1dlkzQXRaMlZ2TG1OaExuTmljbVl1Y25Vd0RRWUpLb1pJDQpodmNOQVFFTEJRQURnZ0VCQUJzdk1penJ6QVM1dlhOWksxOTJuYmo0UjQxMktDaHJYRFNPSDI1MklEL2xKYys5DQo2QS85cmJoaitkYVRTU2c4d3FQUlIzVzhmQTB5Wm5NV3cxVUxhMjl4aWtySlFoVTFrTlJ2UXBHQTJJY05DY0RHDQpZTG52VXlNRi9DVVdyNWtGUVBZd0RLdVN6bUFHM0hFVlJ3ajJrS3U0VUpqSjVaM3FvZjlkTGpUTWU0QnJYZDR5DQpmSGJSMDdxc29ERFAzeHZuUTZaVVZUNG92eksxWlNCQlY1TzZPenpHRU8reUFVNEFPZlMrbVJYVmNyU2F0QWozDQpEK21ENWRyNFNBMmlXbHFhak9YL3RXRUlpZGJWUnpEUm4xZmw5bEhybXBjdG5Oczdhc1V6YytPSkF5OGZHV3JWDQp3eE9LL2xIVzlTcnJ6OFBXTXZGOEpyZDdkSXJuUDhRZ00rblMxYnc9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=
+    tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlFdmdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLZ3dnZ1NrQWdFQUFvSUJBUURlTm1ENG5qSk1RVjdiDQpQeDh4OWYwTDV5MmJvV1NHZ3pkTzFQazJIc3FFa3p3NTJNbi83YUhjU1ROZjRKcklRejQ1RXNRZ3lSMW5GT2o1DQphb2U3aVJKbHNVQnQza2RQNWRnUmZ4ZGZyelo4dU9wQThuOWVpdGtZY3cwTnpzamdWVDg4RmVMMUpQeGhoWEhvDQowNTYvNVNPSS9ueVdMcHB4RURxaEFVRWVjSTZmR0Y2b3BtcnpqMXk4SkZFaVVlQ0hraFJuTXQxcjgrd09tbUliDQpMVU1oSkU3RTF1aGlMSEVDRExOOWIxMURFRUhuUDFMYzhnb2ZyYnpwbU5pVXpzSWh2QUlEQTlhSytIYkwrYjVrDQpENlFXWno0c281R21KaThFbzBkOGoxYTI5dXY3ZmhUZ1dBcGhpNHoza05jclQ0SzBYZTc5NjJEQ1hYMlBUTm1GDQpkQ0NvY1FTaEFnTUJBQUVDZ2dFQkFNRGt2NFRSL3FPSFU0cEszdytGazZZVGhkbkZYZmdPUzZLWTZjUjdNaDJuDQptZTQxTEJTSCthdTV0MmtSRmd1bG80dnpxR0UxYzlxWm9pdHd1R2FvOUZsbVpxRjVCTHBzc1FWdko2RWQvZFNDDQp5SWFjZXNoZEMxdFg5QXI2YUJHa3JvSEFGZ1hybDFJb2Z0czNhR1QzeWNNUDlxSi96ZjA3czBrMFI0emU5RTlSDQpQMlBJUEtsWk9HdHhIUVp6ZVRaeTZxTHhEeU5YYWFXTk1rbGo4TEZpbk56WnNFMkEyUWQzdThKRU1ldm1JRUp5DQpKZEJIYVFMS3E1Yy9kYmdyV1pZODUvL1JjN2dCdk9Ka2xmUTBUZ3U5Q3M4OFh1KzlTRGptdHltRjdyV3NLRkV4DQovNTZBK3MyN0JQYVMyVkFsbnhUbHBXc28wbUhEUm5ZWGlLOXFUY25TRElrQ2dZRUEvZlF1YWxRSnVieFlqQWRCDQpVZi93eHRjazJ5d0VlUFRDV3dxN04wU1lnb2h6ZHVrOHlJbjVnNlUvd1Y5UGk0dyt2TkZFbU1JVXEyZUtIdGtwDQpvOUlEbjZpcUdXRWRsOGxIWE1wS1lmaDVMbWM4SDFzdVFtZlVXQytrbTJZRWJ1ek9CSmcxTmFOMVd2UVBEUkw5DQpSWk10UnZHcGY4ZU9veXNuZUI3eVJOSjdTaXNDZ1lFQTRBQzUxOWpIaU5NaHgzY3ozNkwyUS9PWUdnc2hndDFEDQpJcDU2ellPRjMvS3JITmQ1WVVkdGJuNEVWa0h4MmNSb0NiV2RuWWJmWDVCYWYrdDNHbmhuL3lkUzhqWDlPbnZ4DQozNXFJeTl2cFRGa0JRSzl4QnF6WnptZXZ2Sjk1elFoZ29LTCszdSttUjRpN2M2cExUL2tURnpFc2JPRWRkT0JEDQpPcmxSdHBnTkFtTUNnWUVBaFdoTktkWlQ5WnFYK1plbUhPbVRGeUhXWHJ6VTdLWEhwQVFUTFlsL2hMTWgxUW5aDQp3SSthNENsalFMWk5GMFhwZjA5LzlhK2ZKQndVVnZoR0E2VkQrZytrckFoMGYxUmhoTUZRS2Y5WnlhSzUxczhUDQpraGJ4V2hKTktzV0E5clMzMVhvUUdjbHcwUUw5RlNVd24rZ2RGUFBHMHpXR0hQbUNsbnZMVVpRdzZGa0NnWUFNDQpCLzN6V2ZGZHAvbG9mVDZNQkhTMXNaKzV4bDlHYUJ2ekFCQVllYmYzRDFHaGV2RktDRXdZWXl4WWRiSkh3QVRXDQpnS3EyaTBmMEdnekNVaU5UaUtRTlVFOWtNd0ltNGdGYndURVh3ZmdGNGNIdmQzemFudTRUNS8zSVk4aG0rc3cxDQoxSXRiN2dOQVZGZTlIcWhzNHpQalN3RFgyRDk4eDQ3VTJKOUs3MS9EZ1FLQmdBVUxoV2N0SngwQXFhZDdnMlhDDQpieWZPUmI3WDBnLys1d1JpckR6V3ZJWWswZjdXb0ZHNERhaXloR0R2bDJlK1FhbkYrV1pPcGxCZkc5MGV2cEtRDQpGdVFQNDBqS2xBWTJuVTUyYVUzSC90V1BlTjUzYXJhUGsrd1lpVU52VFQ5OEowYjlic3BOb3hJS0hITXJJckRTDQpYUHJlMHVVdWRHcFcxWEpkTEc4MXM4VkMNCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0NCg==
+  type: Opaque
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: istio-egressgateway-ca-certs
+  data:
+    ca-chain.cert.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tDQpNSUlETnpDQ0FoK2dBd0lCQWdJVWNyV3oxT0QrcDlkVVNnOVk5NUw5QnpKNUYya3dEUVlKS29aSWh2Y05BUUVMDQpCUUF3S3pFUU1BNEdBMVVFQ2d3SFUzbHVZWEJ6WlRFWE1CVUdBMVVFQXd3T2MzbHRjR3hsTG5OaVpYSXVjblV3DQpIaGNOTWpFeE1qRXdNVFV6TXpJMVdoY05NekV3TWpJMk1UVXpNekkxV2pBck1SQXdEZ1lEVlFRS0RBZFRlVzVoDQpjSE5sTVJjd0ZRWURWUVFEREE1emVXMXdiR1V1YzJKbGNpNXlkVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEDQpnZ0VQQURDQ0FRb0NnZ0VCQUptTHVBd05OczJYRzVvNC9JaGZiN0VwM3NLK2N5UVFkMWNGdmRBL2U2OHZmUWwzDQpTYnAvK2tOOURtM2ZUS20rVkVoK2FKc1pleXJrWmVzMGZlRmg1UllSV1lReHFnQzRRYjI2NWJkRUdPT0w0TCtBDQpLQTFOWmJERFVPOExOWTRRZG5sdCtvdEtnbm5EOFhGNVBGSTIyTUhwRCtCZy9CcHZrcUFQNEN3bDVvV0FYWVdIDQoxaXV3Q3FYRmpIWlVnOFRFWWlKUGlxQmtuUXl2REdINkxKcGdoK3AxNlNuSExsU0NVbWNJeCtVMHJtenJWQkI4DQo5T2c0RjVROWlXSUE3SHN3YkViSWg5WG5IYmlXdGtnY2RWck5KNE9vdjVheS9HY1FnT1U0ZU1qWnNpYmMwa2Z6DQpTcnlOU3hIaXVCSWd6eGR6YllrNDZqM3Z5YWxMRU13dHJsdk51d2tDQXdFQUFhTlRNRkV3SFFZRFZSME9CQllFDQpGT05FZHRVZmlocGxZak5CcEhVSnJ5bm1qZEo2TUI4R0ExVWRJd1FZTUJhQUZPTkVkdFVmaWhwbFlqTkJwSFVKDQpyeW5tamRKNk1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFJeFVlSEFpDQppTHRTMVd3Ui9PNVplSC9icHoxWC9LZS9WOUlKYTZyVjJNTFhTQXY3N0cxOXRYVk05bjNRK2puaFkzTEk5Z2x3DQpXc255d21VVE96TGdQSll2R2R3bkptMmZFL0U3RnNuUnFsMWFHdVU3RjZvb2xyT3N3bi9ETUtlYXUzVUIvb1pkDQo0VUplbmNNQStCV2JmVDk4emFaZkI4L2F0R21EQ0JkQXBLbUpPdCswTytlaHU0SE1iRDAyMm5IVHg2eDdpbjYvDQo3K0NXc2IvZVZZZEtuZ2QrUmN0VUlBSUExZXNIS1FUQ29VcnJiL1AzcGRxSnIyWGoxS0tKNGNnWnQ4a1dDbmloDQo4YkZUWWVKSWZsZjBWVERkcnIvdFZtc1F0SStINExNVThjTVBqWnQ4MlVsYlBmU0s2MktnakNCZnc0dmh4eVNDDQpxWU5xYzJTNHowb1hPVnM9DQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tDQo=
+  type: Opaque
