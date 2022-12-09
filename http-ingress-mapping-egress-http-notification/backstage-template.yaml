@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: http-ingress-mapping-egress-http-notification
   elements: http-ingress-mapping-egress-http
-  title: mapping
+  title: myMapping
   type: notification
   description: qwerty
   tags:
