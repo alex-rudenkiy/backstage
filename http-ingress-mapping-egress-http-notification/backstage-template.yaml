@@ -5,7 +5,7 @@ metadata:
   elements: http-ingress-mapping-egress-http
   title: myMapping
   type: notification
-  description: qwerty
+  description: qwertyui
   tags:
   - openshift
   - recommended
