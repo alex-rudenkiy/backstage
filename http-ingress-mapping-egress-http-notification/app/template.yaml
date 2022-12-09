@@ -426,6 +426,53 @@ objects:
         name: http-{{cookiecutter.EGRESS_PORT}}
         number: {{cookiecutter.EGRESS_PORT}}
         protocol: HTTP
+- apiVersion: networking.istio.io/v1alpha3
+  kind: EnvoyFilter
+  metadata:
+    name: trace-filter
+    labels:
+      workload-type: pod
+  spec:
+    configPatches:
+    - applyTo: CLUSTER
+      match:
+        context: SIDECAR_OUTBOUND
+      patch:
+        operation: ADD
+        value:
+          name: trace_analyzer
+          type: LOGICAL_DNS
+          connect_timeout: 0.5s
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+            cluster_name: trace_analyzer
+            endpoints:
+            - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      protocol: TCP
+                      address: apiclarity.saex.svc.cluster.local
+                      port_value: 9000
+- apiVersion: extensions.istio.io/v1alpha1
+  kind: WasmPlugin
+  metadata:
+    name: trace-filter
+  spec:
+    url: oci://ilyinus/wasm
+    phase: AUTHN
+- apiVersion: apiclarity.sbrf.ru/v1alpha1
+  kind: ApiClaritySpec
+  metadata:
+    labels:
+      template: {{cookiecutter.APP_NAME}}
+    name: {{cookiecutter.PROJECT_NAME}}
+  spec:
+    apiSpecs:
+    - name: {{cookiecutter.APP_NAME}}-svc
+      port: 8787
+      rawSpec: {{cookiecutter.RAW_SPEC}}
+      serviceType: {{cookiecutter.SERVICE_TYPE}}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
