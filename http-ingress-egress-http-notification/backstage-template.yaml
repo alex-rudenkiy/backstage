@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: http-ingress-egress-http-notification
   elements: http-ingress-egress-http
-  title: qwerty
+  title: abbb
   type: notification
   description: abc
   tags:
