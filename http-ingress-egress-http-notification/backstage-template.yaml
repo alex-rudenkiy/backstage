@@ -5,7 +5,7 @@ metadata:
   elements: http-ingress-egress-http
   title: proxy
   type: notification
-  description: qwert
+  description: qwerty
   tags:
   - openshift
   - recommended
@@ -15,59 +15,67 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - INGRESS_PORT
-    - APP_NAME
-    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
+    - INGRESS_PORT
+    - ISTIO_CONTROL_PLANE
+    - APP_NAME
     - ISTIOD_NAME
+    - TEST_APP_URL
     properties:
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       INGRESS_PORT:
         title: Порт ингресса
         type: string
-      APP_NAME:
-        title: Название сервиса
-        type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
         type: string
-      PROJECT_NAME:
-        title: Название проекта
+      APP_NAME:
+        title: Название сервиса
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
         type: string
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - EGRESS_PORT
-    - APP_NAME
-    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
+    - EGRESS_PORT
+    - ISTIO_CONTROL_PLANE
+    - APP_NAME
     - ISTIOD_NAME
+    - TEST_APP_URL
     properties:
-      EGRESS_PORT:
-        title: egress port
-        type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      APP_NAME:
-        title: Название сервиса
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      EGRESS_PORT:
+        title: egress port
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
         type: string
-      PROJECT_NAME:
-        title: Название проекта
+      APP_NAME:
+        title: Название сервиса
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
+        type: string
+      TEST_APP_URL:
+        title: Внешний хост приложения
         type: string
   - title: Установка шаблона в проект
     required:
@@ -159,6 +167,7 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: fetch-template
     name: Загрузка шаблона
@@ -174,6 +183,7 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: generate
     name: Генерация шаблона
@@ -191,6 +201,7 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: archive-app-dir
     name: Архивация templates в workspace
