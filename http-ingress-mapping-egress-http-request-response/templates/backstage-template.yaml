@@ -1,11 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-egress-http-notification
-  elements: http-ingress-egress-http
-  title: proxy
-  type: notification
-  description: q
+  name: http-ingress-mapping-egress-http-request-response
+  elements: http-ingress-mapping-egress-http
+  title: httpMapping
+  type: request-response
+  description: qwerty
   tags:
   - openshift
   - recommended
@@ -48,6 +48,46 @@ spec:
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
+        type: string
+  - title: Заполнение полей шаблона для компонента mapping
+    required:
+    - TEST_APP_URL
+    - PROJECT_NAME
+    - INTERNAL_PREFIX
+    - EGRESS_PORT
+    - MAPPING_JSON_RQ
+    - MAPPING_JSON_RS
+    - APP_NAME
+    - EXTERNAL_PORT
+    properties:
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      account:
+        title: Bitbucket account
+        type: string
+        default: user
+        ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
+        type: string
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
+        type: string
+      MAPPING_JSON_RS:
+        title: JSON-строка маппинга ответа
+        type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
         type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
@@ -177,7 +217,11 @@ spec:
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -194,14 +238,18 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
     input:
       url: template.yaml
-      targetPathForEnv: ./templates/openshift-template/template.env
-      targetPathForConfigs: ./templates/configs.yaml
+      targetPathForEnv: app/openshift-template/template.env
+      targetPathForConfigs: app/configs.yaml
       downloadLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app.zip
       viewLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
       values:
@@ -213,7 +261,11 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        UNIMAPPER_IMAGE: registry.sigma.sbrf.ru/dev/ci01994970/ci02001129_synapse_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
