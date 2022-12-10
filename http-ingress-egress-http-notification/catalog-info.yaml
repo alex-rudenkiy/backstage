@@ -4,4 +4,4 @@ metadata:
   name: http-ingress-egress-http-notification
 spec:
   targets:
-  - ./templates/template.yaml
+  - ./templates/backstage-template.yaml
