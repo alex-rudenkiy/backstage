@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-ingress-egress-http-notification
   elements: http-ingress-egress-http
-  title: abbb
+  title: proxy
   type: notification
-  description: abc
+  description: qwerty
   tags:
   - openshift
   - recommended
@@ -15,42 +15,42 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - INGRESS_PORT
+    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
+    - INGRESS_PORT
     - APP_NAME
     - ISTIOD_NAME
-    - ISTIO_CONTROL_PLANE
     properties:
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
+        type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       INGRESS_PORT:
         title: Порт ингресса
         type: string
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       APP_NAME:
         title: Название сервиса
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
         type: string
-      ISTIO_CONTROL_PLANE:
-        title: Название control panel
-        type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - EGRESS_PORT
+    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
     - APP_NAME
+    - EGRESS_PORT
     - ISTIOD_NAME
-    - ISTIO_CONTROL_PLANE
     properties:
-      EGRESS_PORT:
-        title: egress port
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
         type: string
       account:
         title: Bitbucket account
@@ -63,11 +63,11 @@ spec:
       APP_NAME:
         title: Название сервиса
         type: string
+      EGRESS_PORT:
+        title: egress port
+        type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
-        type: string
-      ISTIO_CONTROL_PLANE:
-        title: Название control panel
         type: string
   - title: Установка шаблона в проект
     required:
@@ -155,10 +155,10 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: fetch-template
     name: Загрузка шаблона
@@ -171,9 +171,9 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: generate
     name: Генерация шаблона
@@ -188,9 +188,9 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
+        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
-        ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: archive-app-dir
     name: Архивация templates в workspace
