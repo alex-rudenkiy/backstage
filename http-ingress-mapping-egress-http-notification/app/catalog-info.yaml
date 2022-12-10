@@ -4,4 +4,4 @@ metadata:
   name: http-ingress-mapping-egress-http-notification
 spec:
   targets:
-  - ./template.yaml
+  - ./templates/template.yaml

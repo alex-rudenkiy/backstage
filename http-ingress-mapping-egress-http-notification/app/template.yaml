@@ -193,10 +193,7 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
-        imagePullSecrets:
-        - name: default-secret
-        securityContext:
-          runAsUser: 999
+        securityContext: {}
         serviceAccountName: default
         terminationGracePeriodSeconds: 60
         volumes:
@@ -239,11 +236,26 @@ objects:
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
     servers:
     - hosts:
-      - '*'
+      - ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
       port:
         name: http-{{cookiecutter.INGRESS_PORT}}
         number: {{cookiecutter.INGRESS_PORT}}
         protocol: HTTP
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      template: {{cookiecutter.APP_NAME}}
+      app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
+      istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
+    name: ingressgateway-http
+  spec:
+    host: ingress-{{cookiecutter.PROJECT_NAME}}.apps.{{cookiecutter.CLUSTER}}.sbercloud.ru
+    port:
+      targetPort: http-{{cookiecutter.INGRESS_PORT}}
+    to:
+      kind: Service
+      name: ingressgateway-svc
 - apiVersion: v1
   kind: Service
   metadata:
@@ -252,24 +264,17 @@ objects:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
     name: ingressgateway-svc
-    annotations:
-      kubernetes.io/elb.class: union
-      kubernetes.io/elb.subnet-id: 65529c62-e797-4e26-9282-86db36eb192e
-      kubernetes.io/elb.enterpriseID: a93d5bed-a526-47df-8bf1-5bd895bd1078
-      kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"cce-bandwidth-1669984443744","bandwidth_chargemode":"traffic","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
-      kubernetes.io/elb.lb-algorithm: ROUND_ROBIN
-      kubernetes.io/elb.health-check-flag: 'on'
-      kubernetes.io/elb.health-check-option: '{"protocol":"TCP","delay":"5","timeout":"10","max_retries":"3"}'
   spec:
     ports:
-    - name: http-{{cookiecutter.INGRESS_PORT}}
-      targetPort: {{cookiecutter.INGRESS_PORT}}
-      port: {{cookiecutter.INGRESS_PORT}}
+    - name: status-port
+      port: 15021
       protocol: TCP
+      targetPort: 15021
+    - name: http-{{cookiecutter.INGRESS_PORT}}
+      port: {{cookiecutter.INGRESS_PORT}}
     selector:
       app: ingressgateway-{{cookiecutter.PROJECT_NAME}}
       istio: ingressgateway-{{cookiecutter.PROJECT_NAME}}
-    type: LoadBalancer
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -320,8 +325,6 @@ objects:
             requests:
               cpu: 150m
               memory: 100Mi
-        imagePullSecrets:
-        - name: default-secret
 - kind: Service
   apiVersion: v1
   metadata:
@@ -426,53 +429,6 @@ objects:
         name: http-{{cookiecutter.EGRESS_PORT}}
         number: {{cookiecutter.EGRESS_PORT}}
         protocol: HTTP
-- apiVersion: networking.istio.io/v1alpha3
-  kind: EnvoyFilter
-  metadata:
-    name: trace-filter
-    labels:
-      workload-type: pod
-  spec:
-    configPatches:
-    - applyTo: CLUSTER
-      match:
-        context: SIDECAR_OUTBOUND
-      patch:
-        operation: ADD
-        value:
-          name: trace_analyzer
-          type: LOGICAL_DNS
-          connect_timeout: 0.5s
-          lb_policy: ROUND_ROBIN
-          load_assignment:
-            cluster_name: trace_analyzer
-            endpoints:
-            - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      protocol: TCP
-                      address: apiclarity.saex.svc.cluster.local
-                      port_value: 9000
-- apiVersion: extensions.istio.io/v1alpha1
-  kind: WasmPlugin
-  metadata:
-    name: trace-filter
-  spec:
-    url: oci://ilyinus/wasm
-    phase: AUTHN
-- apiVersion: apiclarity.sbrf.ru/v1alpha1
-  kind: ApiClaritySpec
-  metadata:
-    labels:
-      template: {{cookiecutter.APP_NAME}}
-    name: {{cookiecutter.PROJECT_NAME}}
-  spec:
-    apiSpecs:
-    - name: {{cookiecutter.APP_NAME}}-svc
-      port: 8787
-      rawSpec: {{cookiecutter.RAW_SPEC}}
-      serviceType: {{cookiecutter.SERVICE_TYPE}}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
