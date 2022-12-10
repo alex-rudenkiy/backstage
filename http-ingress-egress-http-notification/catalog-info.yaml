@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: http-ingress-unimapper-egress-http-notification
+  name: http-ingress-egress-http-notification
 spec:
   targets:
-  - ./template.yaml
+  - ./templates/template.yaml
