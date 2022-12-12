@@ -5,7 +5,7 @@ metadata:
   elements: http-ingress-mapping-egress-http
   title: httpMapping
   type: notification
-  description: 'qweqweqweqweqwe '
+  description: qweqweqew
   tags:
   - openshift
   - recommended
