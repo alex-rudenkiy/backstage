@@ -1,0 +1,7 @@
+site_name: 'MyTest Gateway'
+
+nav:
+  - Описание : index.md
+
+plugins:
+  - techdocs-core
