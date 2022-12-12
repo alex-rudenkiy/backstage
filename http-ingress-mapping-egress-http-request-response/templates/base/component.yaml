@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name:  {{cookiecutter.name | jsonify}}
-  description: MyTest Gateway
+  description: 'HTTP Service'
   annotations:
     backstage.io/techdocs-ref: dir:.
   tags:

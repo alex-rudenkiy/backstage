@@ -1,4 +1,4 @@
-site_name: 'MyTest Gateway'
+site_name: 'HTTP Service'
 
 nav:
   - Описание : index.md
