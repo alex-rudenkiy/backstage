@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: {{cookiecutter.name | jsonify}}
-  description: 'http notif'
+  description: 'Http Service'
 spec:
   targets:
     - ./component.yaml

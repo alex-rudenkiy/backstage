@@ -1,4 +1,4 @@
-site_name: 'http notif'
+site_name: 'Http Service'
 
 nav:
   - Описание : index.md
