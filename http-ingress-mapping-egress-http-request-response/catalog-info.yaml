@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: http-ingress-mapping-egress-http-request-response
+  name: http-ingress-mapping-egress-http-request-response2
 spec:
   targets:
   - ./templates/backstage-template.yaml

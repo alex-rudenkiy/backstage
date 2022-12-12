@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: http-ingress-mapping-egress-http-request-response
+  name: http-ingress-mapping-egress-http-request-response2
   elements: http-ingress-mapping-egress-http
-  title: httpMapping
+  title: httpMapping2
   type: request-response
   description: qwerty
   tags:
