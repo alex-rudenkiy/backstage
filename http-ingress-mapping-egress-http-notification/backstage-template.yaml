@@ -88,6 +88,9 @@ spec:
       RAW_SPEC:
         title: Текст спецификации API-CLARITY
         type: string
+        ui:widget: textarea
+        ui:options:
+          rows: 20
   - title: Заполнение полей шаблона для компонента egress
     required:
     - ISTIO_CONTROL_PLANE
