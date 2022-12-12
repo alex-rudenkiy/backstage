@@ -1,4 +1,4 @@
-site_name: 'httpMapping'
+site_name: 'httpSimpleMapping'
 
 nav:
   - Описание : index.md

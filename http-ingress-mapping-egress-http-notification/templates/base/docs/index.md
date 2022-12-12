@@ -1,3 +1,3 @@
-# httpMapping
+# httpSimpleMapping
 
-qweqweqew
+qwerty
