@@ -468,11 +468,7 @@ objects:
       template: {{cookiecutter.APP_NAME}}
     name: {{cookiecutter.PROJECT_NAME}}
   spec:
-    apiSpecs:
-    - name: {{cookiecutter.APP_NAME}}-svc
-      port: 8787
-      rawSpec: {{cookiecutter.RAW_SPEC}}
-      serviceType: {{cookiecutter.SERVICE_TYPE}}
+    apiSpecs: {{cookiecutter.API_SPECS}}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:

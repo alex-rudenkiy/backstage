@@ -15,54 +15,101 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
-    - INGRESS_PORT
-    - APP_NAME
+    - ISTIO_CONTROL_PLANE
     - ISTIOD_NAME
+    - APP_NAME
+    - INGRESS_PORT
     properties:
-      ISTIO_CONTROL_PLANE:
-        title: Название control panel
+      PROJECT_NAME:
+        title: Название проекта
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
-      INGRESS_PORT:
-        title: Порт ингресса
-        type: string
-      APP_NAME:
-        title: Название сервиса
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
         type: string
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      INGRESS_PORT:
+        title: Порт ингресса
+        type: string
   - title: Заполнение полей шаблона для компонента mapping
     required:
+    - RAW_SPEC
     - PROJECT_NAME
     - TEST_APP_URL
-    - SERVICE_TYPE
-    - EXTERNAL_PORT
-    - MAPPING_JSON_RQ
-    - APP_NAME
-    - INTERNAL_PREFIX
+    - API_SPECS
     - EGRESS_PORT
-    - RAW_SPEC
+    - INTERNAL_PREFIX
+    - EXTERNAL_PORT
+    - SERVICE_TYPE
+    - APP_NAME
+    - MAPPING_JSON_RQ
     properties:
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
+      RAW_SPEC:
+        title: Текст спецификации API-CLARITY
+        type: array
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
       TEST_APP_URL:
         title: Внешний хост приложения
+        type: string
+      API_SPECS:
+        title: Спецификации
+        type: array
+        items:
+          description: Спецификации
+          type: array
+          items:
+            type: object
+            description: Спецификация
+            required:
+            - serviceType
+            - name
+            - port
+            - rawSpec
+            properties:
+              serviceType:
+                title: Тип сервиса
+                type: string
+                enum:
+                - INTERNAL
+                - EXTERNAL
+              name:
+                title: Название сервиса
+                type: string
+                description: 'Пример: petstore-1'
+              port:
+                title: Порт сервиса
+                type: number
+              rawSpec:
+                title: Текст спецификации
+                type: string
+                ui:widget: textarea
+                ui:options:
+                  rows: 20
+      EGRESS_PORT:
+        title: egress port
+        type: string
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
+        type: string
+      EXTERNAL_PORT:
+        title: Порт внешнего приложения
         type: string
       SERVICE_TYPE:
         title: Тип сервиса
@@ -70,51 +117,39 @@ spec:
         enum:
         - INTERNAL
         - EXTERNAL
-      EXTERNAL_PORT:
-        title: Порт внешнего приложения
+      APP_NAME:
+        title: Название сервиса
         type: string
       MAPPING_JSON_RQ:
         title: JSON-строка маппинга запроса
         type: string
-      APP_NAME:
-        title: Название сервиса
-        type: string
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
-        type: string
-      EGRESS_PORT:
-        title: egress port
-        type: string
-      RAW_SPEC:
-        title: Текст спецификации API-CLARITY
-        type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - ISTIO_CONTROL_PLANE
     - PROJECT_NAME
-    - APP_NAME
+    - ISTIO_CONTROL_PLANE
     - EGRESS_PORT
     - ISTIOD_NAME
+    - APP_NAME
     properties:
-      ISTIO_CONTROL_PLANE:
-        title: Название control panel
+      PROJECT_NAME:
+        title: Название проекта
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
-      APP_NAME:
-        title: Название сервиса
+      ISTIO_CONTROL_PLANE:
+        title: Название control panel
         type: string
       EGRESS_PORT:
         title: egress port
         type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -204,16 +239,17 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        RAW_SPEC: ${{parameters.RAW_SPEC}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        API_SPECS: ${{parameters.API_SPECS}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -226,16 +262,17 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        RAW_SPEC: ${{parameters.RAW_SPEC}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        API_SPECS: ${{parameters.API_SPECS}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -250,16 +287,17 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        RAW_SPEC: ${{parameters.RAW_SPEC}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        API_SPECS: ${{parameters.API_SPECS}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
+        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
