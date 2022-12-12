@@ -45,13 +45,11 @@ spec:
     required:
     - PROJECT_NAME
     - TEST_APP_URL
-    - SERVICE_TYPE
     - EXTERNAL_PORT
     - MAPPING_JSON_RQ
     - APP_NAME
     - INTERNAL_PREFIX
     - EGRESS_PORT
-    - RAW_SPEC
     properties:
       PROJECT_NAME:
         title: Название проекта
@@ -64,12 +62,6 @@ spec:
       TEST_APP_URL:
         title: Внешний хост приложения
         type: string
-      SERVICE_TYPE:
-        title: Тип сервиса
-        type: string
-        enum:
-        - INTERNAL
-        - EXTERNAL
       EXTERNAL_PORT:
         title: Порт внешнего приложения
         type: string
@@ -85,12 +77,6 @@ spec:
       EGRESS_PORT:
         title: egress port
         type: string
-      RAW_SPEC:
-        title: Текст спецификации API-CLARITY
-        type: string
-        ui:widget: textarea
-        ui:options:
-          rows: 20
   - title: Заполнение полей шаблона для компонента egress
     required:
     - ISTIO_CONTROL_PLANE
@@ -210,13 +196,11 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -232,13 +216,11 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -256,13 +238,11 @@ spec:
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
         ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        SERVICE_TYPE: ${{parameters.SERVICE_TYPE}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        RAW_SPEC: ${{parameters.RAW_SPEC}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
