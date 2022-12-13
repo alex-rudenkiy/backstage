@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: {{cookiecutter.name | jsonify}}
+  description: 'http service req/res'
+spec:
+  targets:
+    - ./component.yaml

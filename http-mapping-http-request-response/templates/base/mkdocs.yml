@@ -1,0 +1,7 @@
+site_name: 'http service req/res'
+
+nav:
+  - Описание : index.md
+
+plugins:
+  - techdocs-core
