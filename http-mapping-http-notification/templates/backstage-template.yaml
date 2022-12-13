@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-mapping-http-notification
   elements: http-mapping-http
-  title: Http service
+  title: http service
   type: notification
-  description: http mapping service without ingress or egress gateways
+  description: http service
   tags:
   - openshift
   - recommended
@@ -15,39 +15,23 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента mapping
     required:
-    - TEST_APP_URL
-    - EXTERNAL_PORT
-    - APP_NAME
     - INTERNAL_PREFIX
-    - PROJECT_NAME
-    - EGRESS_PORT
     - MAPPING_JSON_RQ
+    - APP_NAME
     properties:
-      TEST_APP_URL:
-        title: Внешний хост приложения
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      EXTERNAL_PORT:
-        title: Порт внешнего приложения
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
         type: string
       APP_NAME:
         title: Название сервиса
-        type: string
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
-        type: string
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
-      EGRESS_PORT:
-        title: egress port
-        type: string
-      MAPPING_JSON_RQ:
-        title: JSON-строка маппинга запроса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -135,12 +119,9 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -149,15 +130,12 @@ spec:
       cookiecutterCompat: true
       targetPath: app/openshift-template
       values:
-        PROJECT_NAME: ${{parameters.PROJECT_NAME}}
+        PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${PROXY_IMAGE}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -171,12 +149,9 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
-        EGRESS_PORT: ${{parameters.EGRESS_PORT}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir

@@ -20,7 +20,7 @@ objects:
         labels:
           app: {{cookiecutter.APP_NAME}}
         annotations:
-          sidecar.istio.io/inject: 'true'
+          sidecar.istio.io/inject: 'false'
       spec:
         volumes:
         - name: app-config
@@ -98,64 +98,3 @@ objects:
           host: {{cookiecutter.APP_NAME}}-svc
           port:
             number: 8787
-- apiVersion: networking.istio.io/v1alpha3
-  kind: ServiceEntry
-  metadata:
-    name: {{cookiecutter.APP_NAME}}-external-host
-  spec:
-    exportTo:
-    - .
-    hosts:
-    - {{cookiecutter.TEST_APP_URL}}
-    ports:
-    - name: http
-      number: {{cookiecutter.EXTERNAL_PORT}}
-      protocol: HTTP
-    resolution: DNS
-- apiVersion: networking.istio.io/v1alpha3
-  kind: VirtualService
-  metadata:
-    name: {{cookiecutter.APP_NAME}}-egress-vs
-  spec:
-    exportTo:
-    - .
-    gateways:
-    - {{cookiecutter.APP_NAME}}-egressgateway-gw
-    - mesh
-    hosts:
-    - {{cookiecutter.TEST_APP_URL}}
-    http:
-    - match:
-      - gateways:
-        - mesh
-        port: {{cookiecutter.EXTERNAL_PORT}}
-      route:
-      - destination:
-          host: egressgateway-svc
-          port:
-            number: 8080
-    - match:
-      - gateways:
-        - {{cookiecutter.APP_NAME}}-egressgateway-gw
-        port: 8080
-      route:
-      - destination:
-          host: {{cookiecutter.TEST_APP_URL}}
-          port:
-            number: {{cookiecutter.EXTERNAL_PORT}}
-- apiVersion: networking.istio.io/v1alpha3
-  kind: Gateway
-  metadata:
-    labels:
-      template: {{cookiecutter.APP_NAME}}
-    name: {{cookiecutter.APP_NAME}}-egressgateway-gw
-  spec:
-    selector:
-      istio: egressgateway-{{cookiecutter.PROJECT_NAME}}
-    servers:
-    - hosts:
-      - {{cookiecutter.TEST_APP_URL}}
-      port:
-        name: http-{{cookiecutter.EGRESS_PORT}}
-        number: {{cookiecutter.EGRESS_PORT}}
-        protocol: HTTP
