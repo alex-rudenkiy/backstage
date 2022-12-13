@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: http-mapping-http-notification
+objects:
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: {{cookiecutter.APP_NAME}}
+    labels:
+      template: {{cookiecutter.APP_NAME}}
+      app: {{cookiecutter.APP_NAME}}
+  spec:
+    selector:
+      matchLabels:
+        app: {{cookiecutter.APP_NAME}}
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          app: {{cookiecutter.APP_NAME}}
+        annotations:
+          sidecar.istio.io/inject: 'true'
+      spec:
+        volumes:
+        - name: app-config
+          configMap:
+            name: {{cookiecutter.APP_NAME}}-cm
+            defaultMode: 420
+        containers:
+        - name: {{cookiecutter.APP_NAME}}
+          image: {{cookiecutter.UNIMAPPER_IMAGE}}
+          ports:
+          - containerPort: 8787
+            protocol: TCP
+          env:
+          - name: PROJECT_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          envFrom:
+          - configMapRef:
+              name: {{cookiecutter.APP_NAME}}-cm
+          volumeMounts:
+          - name: app-config
+            readOnly: true
+            mountPath: /schemas
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 150m
+              memory: 100Mi
+        imagePullSecrets:
+        - name: default-secret
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: {{cookiecutter.APP_NAME}}-svc
+  spec:
+    selector:
+      app: {{cookiecutter.APP_NAME}}
+    ports:
+    - name: http
+      protocol: TCP
+      port: 8787
+      targetPort: 8787
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: {{cookiecutter.APP_NAME}}-cm
+    labels:
+      app: {{cookiecutter.APP_NAME}}
+  data:
+    TRANSFORM_RESPONSE: 'false'
+    LOG_LEVEL: debug
+    JSON_REQUEST: /schemas/json-request.json
+    json-request.json: '[{{cookiecutter.MAPPING_JSON_RQ}}]'
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    name: {{cookiecutter.APP_NAME}}-ingress-vs
+  spec:
+    exportTo:
+    - .
+    gateways:
+    - ingressgateway-gw
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /{{cookiecutter.INTERNAL_PREFIX}}
+      route:
+      - destination:
+          host: {{cookiecutter.APP_NAME}}-svc
+          port:
+            number: 8787
+- apiVersion: networking.istio.io/v1alpha3
+  kind: ServiceEntry
+  metadata:
+    name: {{cookiecutter.APP_NAME}}-external-host
+  spec:
+    exportTo:
+    - .
+    hosts:
+    - {{cookiecutter.TEST_APP_URL}}
+    ports:
+    - name: http
+      number: {{cookiecutter.EXTERNAL_PORT}}
+      protocol: HTTP
+    resolution: DNS
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    name: {{cookiecutter.APP_NAME}}-egress-vs
+  spec:
+    exportTo:
+    - .
+    gateways:
+    - {{cookiecutter.APP_NAME}}-egressgateway-gw
+    - mesh
+    hosts:
+    - {{cookiecutter.TEST_APP_URL}}
+    http:
+    - match:
+      - gateways:
+        - mesh
+        port: {{cookiecutter.EXTERNAL_PORT}}
+      route:
+      - destination:
+          host: egressgateway-svc
+          port:
+            number: 8080
+    - match:
+      - gateways:
+        - {{cookiecutter.APP_NAME}}-egressgateway-gw
+        port: 8080
+      route:
+      - destination:
+          host: {{cookiecutter.TEST_APP_URL}}
+          port:
+            number: {{cookiecutter.EXTERNAL_PORT}}
+- apiVersion: networking.istio.io/v1alpha3
+  kind: Gateway
+  metadata:
+    labels:
+      template: {{cookiecutter.APP_NAME}}
+    name: {{cookiecutter.APP_NAME}}-egressgateway-gw
+  spec:
+    selector:
+      istio: egressgateway-{{cookiecutter.PROJECT_NAME}}
+    servers:
+    - hosts:
+      - {{cookiecutter.TEST_APP_URL}}
+      port:
+        name: http-{{cookiecutter.EGRESS_PORT}}
+        number: {{cookiecutter.EGRESS_PORT}}
+        protocol: HTTP

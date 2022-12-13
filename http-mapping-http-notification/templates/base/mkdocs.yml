@@ -1,0 +1,7 @@
+site_name: 'Http service'
+
+nav:
+  - Описание : index.md
+
+plugins:
+  - techdocs-core
