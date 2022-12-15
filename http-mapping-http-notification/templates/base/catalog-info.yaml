@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: {{cookiecutter.name | jsonify}}
-  description: 'Сервис для внутрикластерного взаимодействия без граничных прокси'
+  description: 'http mapping'
 spec:
   targets:
     - ./component.yaml

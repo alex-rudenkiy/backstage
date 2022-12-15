@@ -1,4 +1,4 @@
-site_name: 'Http notification'
+site_name: 'http mapping'
 
 nav:
   - Описание : index.md

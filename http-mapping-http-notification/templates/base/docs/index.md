@@ -1,3 +1,3 @@
-# Http notification
+# http mapping
 
-Сервис для внутрикластерного взаимодействия без граничных прокси
+http mapping

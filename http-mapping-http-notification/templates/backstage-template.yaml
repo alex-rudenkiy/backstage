@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-mapping-http-notification
   elements: http-mapping-http
-  title: Http notification
+  title: http mapping
   type: notification
-  description: Сервис для внутрикластерного взаимодействия без граничных прокси
+  description: http mapping
   tags:
   - openshift
   - recommended
