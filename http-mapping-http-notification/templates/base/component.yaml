@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name:  {{cookiecutter.name | jsonify}}
-  description: 'http service'
+  description: 'Сервис для внутрикластерного взаимодействия без граничных прокси'
   annotations:
     backstage.io/techdocs-ref: dir:.
   tags:

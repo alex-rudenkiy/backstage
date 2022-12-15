@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-mapping-http-notification
   elements: http-mapping-http
-  title: http service
+  title: Http notification
   type: notification
-  description: http service
+  description: Сервис для внутрикластерного взаимодействия без граничных прокси
   tags:
   - openshift
   - recommended
@@ -15,23 +15,23 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента mapping
     required:
+    - APP_NAME
     - INTERNAL_PREFIX
     - MAPPING_JSON_RQ
-    - APP_NAME
     properties:
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
+      APP_NAME:
+        title: Название сервиса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
+        type: string
       MAPPING_JSON_RQ:
         title: JSON-строка маппинга запроса
-        type: string
-      APP_NAME:
-        title: Название сервиса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -120,8 +120,8 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -134,8 +134,8 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${PROXY_IMAGE}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -150,8 +150,8 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir

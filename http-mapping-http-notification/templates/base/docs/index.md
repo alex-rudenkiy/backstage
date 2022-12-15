@@ -1,3 +1,3 @@
-# http service
+# Http notification
 
-http service
+Сервис для внутрикластерного взаимодействия без граничных прокси
