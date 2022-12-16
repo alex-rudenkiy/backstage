@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: {{cookiecutter.name | jsonify}}
-  description: 'Http Service'
+  description: 'http-ingress-mapping-egress-http'
 spec:
   targets:
     - ./component.yaml

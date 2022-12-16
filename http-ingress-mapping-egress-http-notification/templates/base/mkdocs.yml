@@ -1,4 +1,4 @@
-site_name: 'Http Service'
+site_name: 'http-ingress-mapping-egress-http'
 
 nav:
   - Описание : index.md
