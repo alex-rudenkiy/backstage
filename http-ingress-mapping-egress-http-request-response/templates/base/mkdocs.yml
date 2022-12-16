@@ -1,4 +1,4 @@
-site_name: 'HTTP Service'
+site_name: 'HTTP request/response'
 
 nav:
   - Описание : index.md
