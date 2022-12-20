@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-ingress-mapping-egress-http-request-response
   elements: http-ingress-mapping-egress-http
-  title: HTTP request/response
+  title: test http-http
   type: request-response
-  description: HTTP request/response
+  description: test http-http
   tags:
   - openshift
   - recommended
