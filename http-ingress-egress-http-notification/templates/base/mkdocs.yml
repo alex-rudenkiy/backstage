@@ -1,0 +1,7 @@
+site_name: 'httpProxy'
+
+nav:
+  - Описание : index.md
+
+plugins:
+  - techdocs-core

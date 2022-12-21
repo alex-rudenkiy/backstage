@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-ingress-egress-http-notification
   elements: http-ingress-egress-http
-  title: proxy
+  title: httpProxy
   type: notification
-  description: q
+  description: qwerty
   tags:
   - openshift
   - recommended
@@ -15,72 +15,72 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента ingress
     required:
-    - TEST_APP_URL
-    - PROJECT_NAME
-    - ISTIOD_NAME
-    - APP_NAME
     - INGRESS_PORT
+    - ISTIOD_NAME
     - EXTERNAL_PORT
+    - PROJECT_NAME
+    - TEST_APP_URL
+    - APP_NAME
     - ISTIO_CONTROL_PLANE
     properties:
-      TEST_APP_URL:
-        title: Внешний хост приложения
+      INGRESS_PORT:
+        title: Порт ингресса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
         type: string
-      APP_NAME:
-        title: Название сервиса
-        type: string
-      INGRESS_PORT:
-        title: Порт ингресса
-        type: string
       EXTERNAL_PORT:
         title: Порт внешнего приложения
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
         type: string
   - title: Заполнение полей шаблона для компонента egress
     required:
-    - TEST_APP_URL
-    - PROJECT_NAME
     - ISTIOD_NAME
     - EGRESS_PORT
-    - APP_NAME
     - EXTERNAL_PORT
+    - PROJECT_NAME
+    - TEST_APP_URL
+    - APP_NAME
     - ISTIO_CONTROL_PLANE
     properties:
-      TEST_APP_URL:
-        title: Внешний хост приложения
-        type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      PROJECT_NAME:
-        title: Название проекта
-        type: string
       ISTIOD_NAME:
         title: Название деплоймента istiod
         type: string
       EGRESS_PORT:
         title: egress port
         type: string
-      APP_NAME:
-        title: Название сервиса
-        type: string
       EXTERNAL_PORT:
         title: Порт внешнего приложения
+        type: string
+      PROJECT_NAME:
+        title: Название проекта
+        type: string
+      TEST_APP_URL:
+        title: Внешний хост приложения
+        type: string
+      APP_NAME:
+        title: Название сервиса
         type: string
       ISTIO_CONTROL_PLANE:
         title: Название control panel
@@ -171,12 +171,12 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
-        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: fetch-template
     name: Загрузка шаблона
@@ -189,10 +189,10 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: generate
@@ -200,18 +200,18 @@ spec:
     action: generate:template
     input:
       url: template.yaml
-      targetPathForEnv: ./templates/openshift-template/template.env
-      targetPathForConfigs: ./templates/configs.yaml
+      targetPathForEnv: app/openshift-template/template.env
+      targetPathForConfigs: app/configs.yaml
       downloadLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app.zip
       viewLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
       values:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        PROXY_IMAGE: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8@sha256:03ba7a4bed6122c842ac0aeca626be7e6f3ec2106acee2ffda017c8cbf36e41b
-        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
-        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
+        PROXY_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/proxyv2:1.12.1.2
         INGRESS_PORT: ${{parameters.INGRESS_PORT}}
+        ISTIOD_NAME: ${{parameters.ISTIOD_NAME}}
         EXTERNAL_PORT: ${{parameters.EXTERNAL_PORT}}
+        TEST_APP_URL: ${{parameters.TEST_APP_URL}}
         ISTIO_CONTROL_PLANE: ${{parameters.ISTIO_CONTROL_PLANE}}
         EGRESS_PORT: ${{parameters.EGRESS_PORT}}
   - id: archive-app-dir
