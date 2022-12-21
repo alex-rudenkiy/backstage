@@ -107,7 +107,7 @@ spec:
               type: string
               description: Cluster
               enum:
-              - https://37.18.100.80:5443
+              - https://87.242.93.154:5443
             project:
               title: Project
               type: string
