@@ -1,4 +1,4 @@
-site_name: 'test http-http'
+site_name: 'HTTP Service'
 
 nav:
   - Описание : index.md

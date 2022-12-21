@@ -2,7 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name:  {{cookiecutter.name | jsonify}}
-  description: 'test http-http'
+  description: 'HTTP service with ingress gateway, mapping and egress gateway'
   annotations:
     backstage.io/techdocs-ref: dir:.
   tags:

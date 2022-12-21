@@ -1,3 +1,3 @@
-# test http-http
+# HTTP Service
 
-test http-http
+HTTP service with ingress gateway, mapping and egress gateway
