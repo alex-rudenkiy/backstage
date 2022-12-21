@@ -1,4 +1,4 @@
-site_name: 'http-ingress-mapping-egress-http'
+site_name: 'mappingNotifier'
 
 nav:
   - Описание : index.md
