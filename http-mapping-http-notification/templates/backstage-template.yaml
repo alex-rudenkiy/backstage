@@ -15,12 +15,12 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента mapping
     required:
-    - INTERNAL_PREFIX
-    - APP_NAME
     - MAPPING_JSON_RQ
+    - APP_NAME
+    - INTERNAL_PREFIX
     properties:
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
+      MAPPING_JSON_RQ:
+        title: JSON-строка маппинга запроса
         type: string
       account:
         title: Bitbucket account
@@ -30,8 +30,8 @@ spec:
       APP_NAME:
         title: Название сервиса
         type: string
-      MAPPING_JSON_RQ:
-        title: JSON-строка маппинга запроса
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -119,9 +119,9 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -133,9 +133,9 @@ spec:
         PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${PROXY_IMAGE}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -149,9 +149,9 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
