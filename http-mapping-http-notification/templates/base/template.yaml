@@ -20,7 +20,7 @@ objects:
         labels:
           app: {{cookiecutter.APP_NAME}}
         annotations:
-          sidecar.istio.io/inject: 'true'
+          sidecar.istio.io/inject: 'false'
       spec:
         volumes:
         - name: app-config
