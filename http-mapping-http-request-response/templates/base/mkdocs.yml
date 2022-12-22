@@ -1,4 +1,4 @@
-site_name: 'http service req/res'
+site_name: 'http'
 
 nav:
   - Описание : index.md

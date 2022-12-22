@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-mapping-http-request-response
   elements: http-mapping-http
-  title: http service req/res
+  title: http
   type: request-response
-  description: http service req/res
+  description: http
   tags:
   - openshift
   - recommended
@@ -15,27 +15,27 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента mapping
     required:
-    - MAPPING_JSON_RS
     - INTERNAL_PREFIX
-    - MAPPING_JSON_RQ
     - APP_NAME
+    - MAPPING_JSON_RS
+    - MAPPING_JSON_RQ
     properties:
-      MAPPING_JSON_RS:
-        title: JSON-строка маппинга ответа
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
+      APP_NAME:
+        title: Название сервиса
+        type: string
+      MAPPING_JSON_RS:
+        title: JSON-строка маппинга ответа
         type: string
       MAPPING_JSON_RQ:
         title: JSON-строка маппинга запроса
-        type: string
-      APP_NAME:
-        title: Название сервиса
         type: string
   - title: Установка шаблона в проект
     required:
@@ -59,7 +59,7 @@ spec:
               type: string
               description: Cluster
               enum:
-              - https://37.18.100.80:5443
+              - https://87.242.93.154:5443
             project:
               title: Project
               type: string
@@ -123,10 +123,10 @@ spec:
         owner: ${{ parameters.owner }}
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
-        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: fetch-template
     name: Загрузка шаблона
     action: fetch:template
@@ -138,10 +138,10 @@ spec:
         PROJECT_NAME: ${PROJECT_NAME}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${PROXY_IMAGE}
-        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: ${{parameters.UNIMAPPER_IMAGE}}
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: generate
     name: Генерация шаблона
     action: generate:template
@@ -149,16 +149,16 @@ spec:
       url: template.yaml
       targetPathForEnv: app/openshift-template/template.env
       targetPathForConfigs: app/configs.yaml
-      downloadLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app.zip
-      viewLink: http://87.242.125.177:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
+      downloadLink: http://188.72.109.229:8080/users/BACKSTAGE_USER_ID/app.zip
+      viewLink: http://188.72.109.229:8080/users/BACKSTAGE_USER_ID/app/configs.yaml
       values:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
-        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
         UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        MAPPING_JSON_RS: ${{parameters.MAPPING_JSON_RS}}
+        MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: archive-app-dir
     name: Архивация templates в workspace
     action: archive:localdir
