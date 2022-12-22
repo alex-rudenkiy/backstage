@@ -1,3 +1,3 @@
-# http service
+# http
 
-http-mapping-http
+http

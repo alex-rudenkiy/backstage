@@ -3,9 +3,9 @@ kind: Template
 metadata:
   name: http-mapping-http-notification
   elements: http-mapping-http
-  title: http service
+  title: http
   type: notification
-  description: http-mapping-http
+  description: http
   tags:
   - openshift
   - recommended
@@ -15,20 +15,20 @@ spec:
   parameters:
   - title: Заполнение полей шаблона для компонента mapping
     required:
-    - APP_NAME
     - INTERNAL_PREFIX
+    - APP_NAME
     - MAPPING_JSON_RQ
     properties:
-      APP_NAME:
-        title: Название сервиса
+      INTERNAL_PREFIX:
+        title: Префикс для целевого сервиса
         type: string
       account:
         title: Bitbucket account
         type: string
         default: user
         ui:widget: hidden
-      INTERNAL_PREFIX:
-        title: Префикс для целевого сервиса
+      APP_NAME:
+        title: Название сервиса
         type: string
       MAPPING_JSON_RQ:
         title: JSON-строка маппинга запроса
@@ -120,7 +120,7 @@ spec:
         PROJECT_NAME: ${{parameters.PROJECT_NAME}}
         APP_NAME: ${{parameters.APP_NAME}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: fetch-template
     name: Загрузка шаблона
@@ -150,7 +150,7 @@ spec:
         APP_NAME: ${{parameters.APP_NAME}}
         PROXY_IMAGE: ${{parameters.PROXY_IMAGE}}
         INTERNAL_PREFIX: ${{parameters.INTERNAL_PREFIX}}
-        UNIMAPPER_IMAGE: hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
+        UNIMAPPER_IMAGE: swr.ru-moscow-1.hc.sbercloud.ru/sber/ci90000193_synprod_dev/ci02564634_asgt-unimapper-dev:0.1.0.5
         MAPPING_JSON_RQ: ${{parameters.MAPPING_JSON_RQ}}
   - id: archive-app-dir
     name: Архивация templates в workspace
